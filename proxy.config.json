@@ -1,0 +1,22 @@
+{
+    "/ERP/*":{
+        "target":"http://41.228.33.200:3333",
+        "secure":false,
+        "logLevel":"debug",
+        "pathRewrite":
+        {
+            "^/ERP":""
+        }
+    }
+    
+    ,
+    "/WMS/*":{
+        "target":"http://127.0.0.1:5000/",
+        "secure":false,
+        "logLevel":"debug",
+        "pathRewrite":
+        {
+            "^/WMS":""
+        }
+    }
+}

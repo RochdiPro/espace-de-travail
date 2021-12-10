@@ -1,0 +1,62 @@
+<h1 mat-dialog-title>Options Ligne </h1>
+
+<div mat-dialog-content>
+    <div class="card-body max-height">
+        <div class="row">
+            <div class="row">
+                <div class="col-3">
+
+                    Alignement:
+                </div>
+                <div class="col-6">
+                    <mat-radio-group color="primary"  [(ngModel)]="alignement" aria-label="Select an option">
+                        <mat-radio-button value="vertical">Vertical</mat-radio-button>
+                        <mat-radio-button value="horizental">Horizental</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Style:
+                </div>
+                <div class="col-6">
+                    <mat-radio-group color="primary"   [(ngModel)]="style" aria-label="Select an option">
+                        <mat-radio-button value="simple">Simple</mat-radio-button>
+                        <mat-radio-button value="pointee">Pointée</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            </div>
+            <!-- <span>
+                <button id="add-text" data-toggle="tooltip" data-placement="bottom" title="Add text"
+                    class="btn btn-primary" (click)="addFigure('lineVerticale');">
+                    Ligne Vertical
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                </button>
+                <button id="add-text" data-toggle="tooltip" data-placement="bottom" title="Add text"
+                class="btn btn-primary" (click)="addFigure('lineHorizental');">
+                Ligne Horizentale
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                </button>
+                <button id="add-text" data-toggle="tooltip" data-placement="bottom" title="Add text"
+                class="btn btn-primary" (click)="addFigure('dottedHorizental');">
+                Ligne pointée Vertical
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                </button>
+                <button id="add-text" data-toggle="tooltip" data-placement="bottom" title="Add text"
+                class="btn btn-primary" (click)="addFigure('dottedvertical');">
+                Ligne pointée Vertical
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                </button>
+            </span> -->
+
+
+            
+        </div>
+    </div>
+</div>
+
+<div mat-dialog-actions class="float-right">
+    <button class="mb-2 mr-2 btn btn-success" (click)="onSubmit()">Valider</button>
+     <button class="mb-2 mr-2 btn btn-primary" (click)="close()">Fermer</button>
+
+</div>

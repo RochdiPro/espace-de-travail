@@ -1,0 +1,456 @@
+<div class="row">
+    <div class="col-xl-12">
+        <div class="row">
+            <div class="col-xl-12 text-right">
+                <button data-toggle="tooltip" data-placement="bottom" title="Export to image" type="button"
+                    class="btn btn-primary" (click)="rasterize();">
+                    <i class="fa fa-download" aria-hidden="true"></i> Exporter image</button>
+                <button data-toggle="tooltip" data-placement="bottom" title="Export to SVG" type="button"
+                    class="btn btn-primary" (click)="rasterizeSVG();">
+                    <i class="fa fa-download" aria-hidden="true"></i> Exporter SVG</button>
+                <button data-toggle="tooltip" data-placement="bottom" title="Save in localStorage" type="button"
+                    class="btn btn-primary" (click)="saveCanvasToJSON();">
+                    <i class="fa fa-save" aria-hidden="true"></i> Enregistrer</button>
+                <!-- <button data-toggle="tooltip" data-placement="bottom" title="Load from localStorage" type="button" class="btn btn-primary"
+                        (click)="loadCanvasFromJSON();">
+                        <i class="fa fa-save" aria-hidden="true"></i> Enregistrer local</button> -->
+                <button data-toggle="tooltip" data-placement="bottom" title="Clean Canvas" type="button"
+                    class="btn btn-danger" (click)="confirmClear();">
+                    <i class="fa fa-ban" aria-hidden="true"></i> Annuler</button>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<hr>
+
+<div class="row">
+
+
+    <div class="col-2" >
+        <div *ngIf="showTools">
+            <img src="../../../../assets/wms-images/icon/arrows_left_double.png" width="20px" height="20px"
+                (click)="hideTools()">
+        </div>
+
+        <perfect-scrollbar style="max-height: 600px;" [config]="config" *ngIf="showTools">
+            <div>
+                <!-- Taille canvans -->
+                <div class="taille">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control" [(ngModel)]="canvas.size.width"
+                                (keyup)="changeSize()">
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    L
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group mb-4">
+                            <input type="text" class="form-control" [(ngModel)]="canvas.size.height"
+                                (keyup)="changeSize()">
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    H
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- les outils -->
+                <div *ngIf="!canvas.selected">
+                    <!-- back ground color -->
+                    <div class="custom-item" *ngIf="!canvas.props.canvasImage">
+                        <div class="item hasnt_submenu" width="40px">
+                            <label for="backcolor" class="btn">
+                                <img src="../../../../assets/wms-images/icon/backcolor.png" width="40px" height="40px">
+                            </label>
+                            <input id="backcolor" width="20px" type="color" class="form-control" [cpPosition]="'bottom'"
+                                [(colorPicker)]="canvas.props.canvasFill" [style.background]="canvas.props.canvasFill"
+                                [value]="canvas.props.canvasFill" (colorPickerChange)="setCanvasFill()">
+                        </div>
+                    </div>
+
+
+                    <!-- back ground image -->
+                    <div class="custom-item">
+                        <div class="item hasnt_submenu" width="40px">
+                            <label for="files" class="btn">
+                                <img src="../../../../assets/wms-images/icon/uplodeimg.png" width="40px" height="40px">
+                            </label>
+                            <input id="files" style="visibility:hidden;" type="file" (change)="readUrlBack($event);">
+                            <img id="testImage" *ngIf="canvas.urlback" class="images-item-upload" [src]="canvas.urlback"
+                                (click)="setCanvasImageBack(canvas.urlback);">
+
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                    (click)="removeWhiteback(canvas.urlback);">
+                                    <i class="fa fa-times" aria-hidden="true"></i> </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- drawing -->
+
+                    <div class="card-body">
+
+                        <img src="../../../../assets/wms-images/icon/pencil.png" width="40px" height="40px"
+                            (click)="drawLine()">
+
+                    </div>
+
+
+
+                    <!-- ajouter text -->
+                    <div class="card-body">
+                        <img (click)="addTextToggle()" src="../../../../assets/wms-images/icon/text.png" width="40px"
+                            height="40px">
+                        <div *ngIf="addTextShow" class="input-group">
+                            <input type="text" class="form-control" [(ngModel)]="canvas.textString">
+                            <div class="input-group-append">
+                                <span>
+                                    <button id="add-text" data-toggle="tooltip" data-placement="bottom" title="Add text"
+                                        class="btn btn-primary" (click)="addText()">
+                                        <i class="fa fa-plus" aria-hidden="true"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ajout figure menu -->
+                    <div class="item has_submenu" width="40px">
+
+                        <img src="../../../../assets/wms-images/icon/shapes.png" width="40px" height="40px">
+
+                        <div class="submenu">
+                            <div class="item">
+
+                                <div class="btn-group btn-group-vertical" role="group" aria-label="...">
+                                    <div class="row">
+                                        <button type="button" class="btn btn-primary" (click)="addFigure('rectangle');">
+                                            <img src="../../../../../assets/wms-images/icon/rectangle.png" width="30px"
+                                                height="30px">
+                                        </button>
+                                        <button type="button" class="btn btn-primary" (click)="addFigure('square');">
+                                            <img src="../../../../../assets/wms-images/icon/carre.png" width="30px"
+                                                height="30px">
+                                        </button>
+                                    </div>
+                                    <div class="row">
+
+                                        <button type="button" class="btn btn-primary" (click)="addFigure('triangle');">
+                                            <img src="../../../../../assets/wms-images/icon/triangle.png" width="30px"
+                                                height="30px">
+                                        </button>
+                                        <button type="button" class="btn btn-primary" (click)="addFigure('circle');">
+                                            <img src="../../../../../assets/wms-images/icon/circle.png" width="30px"
+                                                height="30px">
+                                        </button>
+                                      
+                                    </div>
+                                    <div class="row">
+                                        
+
+                                        <button type="button" class="btn btn-primary" (click)="openDialogLine()" >
+                                            <img src="../../../../../assets/wms-images/icon/trait.png" width="30px"
+                                                height="30px">
+                                        </button>
+                                        <button type="button" class="btn btn-primary" (click)="openDialogArrow()" >
+                                            <img src="../../../../../assets/wms-images/icon/arrow.png" width="30px"
+                                                height="30px">
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- ajouter image -->
+                    <div class="item has_submenu" width="40px">
+
+                        <img (click)="openDialogImageEspace()" src="../../../../assets/wms-images/icon/img_down.png"
+                            width="40px" height="40px">
+
+                        <div class="submenu">
+                            <div class="item">
+                                <div class="card-body max-height">
+                                    <div class="row">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/camion0.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/forklift0.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/wc-.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/ouut0.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/extinc.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/rec1.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/img1.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/img2.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/img3.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/img4.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/img5.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/img6.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/img7.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/img8.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/img9.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/img10.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../../assets/wms-images/fabric/img11.svg">
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- telecharger image -->
+                    <div class="custom-item">
+                        <div class="item hasnt_submenu" width="40px">
+                            <label for="files" class="btn">
+                                <img src="../../../../assets/wms-images/icon/uplodeimg.png" width="40px" height="40px">
+                            </label>
+                            <input id="files" style="visibility:hidden;" type="file" (change)="readUrl($event);">
+                            <img id="testImage" *ngIf="canvas.url" class="images-item-upload" [src]="canvas.url"
+                                (click)="addImageOnCanvas(canvas.url);">
+
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                    (click)="removeWhite(canvas.url);">
+                                    <i class="fa fa-times" aria-hidden="true"></i> </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </perfect-scrollbar>
+     </div>
+
+   
+
+    <div class="col-xl-8"   >
+        <div *ngIf="!showTools">
+            <img src="../../../../assets/wms-images/icon/arrows_right_double.png" width="20px" height="20px"
+                (click)="showTool()">
+        </div>
+        <angular-editor-fabric-js
+         
+         #canvas  >
+        </angular-editor-fabric-js>
+    </div>
+
+
+
+    <div class="col-xl-2">
+        <perfect-scrollbar style="max-width: 700px; max-height: 600px;" [config]="config">
+
+            <div class="card">
+                <div class="card-header">Options</div>
+                <div class="card-body text-center">
+                    <div class="btn-group" role="group" aria-label="...">
+                        <button data-toggle="tooltip" data-placement="bottom" title="Delete element" type="button"
+                            class="btn btn-outline-danger" [disabled]="!canvas.selected" (click)="removeSelected();">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                        </button>
+                        <button data-toggle="tooltip" data-placement="bottom" title="Send to back" type="button"
+                            class="btn btn-outline-primary" [disabled]="!canvas.selected" (click)="sendToBack();">
+                            <i class="fa fa-level-down" aria-hidden="true"></i>
+                        </button>
+                        <button data-toggle="tooltip" data-placement="bottom" title="Send to front" type="button"
+                            class="btn btn-outline-primary" [disabled]="!canvas.selected" (click)="bringToFront();">
+                            <i class="fa fa-level-up" aria-hidden="true"></i>
+                        </button>
+                        <button data-toggle="tooltip" data-placement="bottom" title="Clone" type="button"
+                            class="btn btn-outline-primary"
+                            [disabled]="!canvas.selected || canvas.selected.type == 'group'" (click)="clone();">
+                            <i class="fa fa-clone" aria-hidden="true"></i>
+                        </button>
+                        <button data-toggle="tooltip" data-placement="bottom" title="Unselect" type="button"
+                            class="btn btn-outline-primary" [disabled]="!canvas.selected" (click)="cleanSelect()">
+                            <i class="fa fa-remove" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <br />
+
+            <br />
+            <div class="card">
+                <div class="card-header">Personnaliser</div>
+                <div class="card-body">
+                    <div class="custom-item" *ngIf="canvas.selected  && canvas.selected.type == 'group'">Group Selected
+                    </div>
+                    <div class="custom-item" *ngIf="!canvas.selected">No items selected</div>
+                    <div class="custom-item" *ngIf="canvas.selected && canvas.selected.type != 'group'">
+                        <div class="custom-item-title">ID</div>
+                        <div class="custom-item-body">
+                            <input type="text" class="form-control" [(ngModel)]="canvas.props.id" (keyup)="setId()">
+                        </div>
+                    </div>
+                    <div class="custom-item" *ngIf="canvas.selected && canvas.selected.type != 'group'">
+                        <div class="custom-item-title">Opacité</div>
+                        <div class="custom-item-body">
+                            <input type="range" [(ngModel)]="canvas.props.opacity"
+                                (change)="setOpacity()">{{canvas.props.opacity}}
+                        </div>
+
+                        <div class="custom-item-title">Couleur</div>
+                        <div class="custom-item-body">
+                            <input type="text" class="form-control" [cpPosition]="'bottom'"
+                                [(colorPicker)]="canvas.props.fill" [style.background]="canvas.props.fill"
+                                [value]="canvas.props.fill" (colorPickerChange)="setFill()">
+                        </div>
+                    </div>
+
+                    <div class="custom-item" *ngIf="canvas.selected && canvas.textEditor">
+                        <div class="custom-item-title">Police</div>
+                        <div class="custom-item-body">
+                            <select [(ngModel)]="canvas.props.fontFamily" class="form-control"
+                                (change)="setFontFamily()">
+                                <option value="arial">Arial</option>
+                                <option value="helvetica" selected>Helvetica</option>
+                                <option value="verdana">Verdana</option>
+                                <option value="courier">Courier</option>
+                                <option value="Roboto">Roboto</option>
+                                <option value="Open Sans">Open Sans</option>
+                                <option value="Zilla Slab">Zilla Slab</option>
+                                <option value="Lato">Lato</option>
+                                <option value="Bellefair">Bellefair</option>
+                                <option value="Fresca">Fresca</option>
+                                <option value="Raleway">Raleway</option>
+                                <option value="Open Sans Condensed">Open Sans Condensed</option>
+                                <option value="Indie Flower">Indie Flower</option>
+                                <option value="Josefin Sans">Josefin Sans</option>
+                                <option value="Inconsolata">Inconsolata</option>
+                                <option value="Pacifico">Pacifico</option>
+                                <option value="Gloria Hallelujah">Gloria Hallelujah</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="custom-item" *ngIf="canvas.selected && canvas.textEditor">
+                        <div class="custom-item-title">Alignement</div>
+                        <div class="custom-item-body text-center">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <button type="button" class="btn btn-primary"
+                                    [ngClass]="{'active': canvas.props.textAlign == 'left' }"
+                                    (click)="setTextAlign('left')">
+                                    <i class="fa fa-align-left"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary"
+                                    [ngClass]="{'active': canvas.props.textAlign == 'center' }"
+                                    (click)="setTextAlign('center')">
+                                    <i class="fa fa-align-center"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary"
+                                    [ngClass]="{'active': canvas.props.textAlign == 'right' }"
+                                    (click)="setTextAlign('right')">
+                                    <i class="fa fa-align-right"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary"
+                                    [ngClass]="{'active': canvas.props.textAlign == 'justify' }"
+                                    (click)="setTextAlign('justify')">
+                                    <i class="fa fa-align-justify"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-item" *ngIf="canvas.selected && canvas.textEditor">
+                        <div class="custom-item-title">Style</div>
+                        <div class="custom-item-body text-center">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <button type="button" class="btn btn-primary btn-sm"
+                                    [ngClass]="{'active': canvas.props.fontWeight }" (click)="setBold()">
+                                    <i class="fa fa-bold"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm"
+                                    [ngClass]="{'active': canvas.props.fontStyle }" (click)="setFontStyle()">
+                                    <i class="fa fa-italic"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm"
+                                    [ngClass]="{'active': hasTextDecoration('underline') }"
+                                    (click)="setTextDecoration('underline')">
+                                    <i class="fa fa-underline"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm"
+                                    [ngClass]="{'active': hasTextDecoration('overline') }"
+                                    (click)="setTextDecoration('overline')">
+                                    <i class="fa fa-underline fa-flip-vertical"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm"
+                                    [ngClass]="{'active': hasTextDecoration('line-through') }"
+                                    (click)="setTextDecoration('line-through')">
+                                    <i class="fa fa-strikethrough"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-item" *ngIf="canvas.selected && canvas.textEditor">
+                        <div class="custom-item-title">Taille</div>
+                        <div class="custom-item-body">
+                            <input type="range" [(ngModel)]="canvas.props.fontSize" (change)="setFontSize()" step="1"
+                                min="1" max="120">{{canvas.props.fontSize}}
+                        </div>
+                    </div>
+                    <div class="custom-item" *ngIf="canvas.selected && canvas.textEditor">
+                        <div class="custom-item-title">Hauteur ligne</div>
+                        <div class="custom-item-body">
+                            <input type="range" [(ngModel)]="canvas.props.lineHeight" (change)="setLineHeight()"
+                                step="0.1" min="0" max="10">{{canvas.props.lineHeight}}
+                        </div>
+                    </div>
+                    <div class="custom-item" *ngIf="canvas.selected && canvas.textEditor">
+                        <div class="custom-item-title">Espacement</div>
+                        <div class="custom-item-body">
+                            <input type="range" [(ngModel)]="canvas.props.charSpacing" (change)="setCharSpacing()"
+                                step="10" min="-200" max="800">{{canvas.props.charSpacing}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </perfect-scrollbar>
+
+    </div>
+
+
+</div>
+
+
+<!-- <div class="row">
+        <div class="col-xl-12">
+            <br/>
+            <div class="card">
+                <div class="card-header">
+                    <button type="button" class="btn btn-primary btn-sm" (click)="rasterizeJSON()">
+                        <i class="fa fa-refresh" aria-hidden="true"></i> Convertir en json</button>
+                </div>
+                <div class="card-body">
+                    <pre>{{canvas.json}}</pre>
+                </div>
+            </div>
+        </div>
+    </div> -->
+<br>
+<br>

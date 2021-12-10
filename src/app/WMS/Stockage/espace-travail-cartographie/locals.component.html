@@ -1,0 +1,85 @@
+<form [formGroup]="localFormGroup">
+  <ng-template matStepLabel>Local</ng-template>
+
+  <div class="row">
+
+    <div class="col-md-4 mb-3" *ngFor="let local of locals;  let i = index">
+      <!-- <div class="card0 green">
+                  <div class="additional">
+                    <div class="user-card0">
+                      <div class="level center">
+                        Depot {{i+1}}
+                      </div>
+                      <div class="points center">
+                        {{local.categorie_Local}}
+                      </div>
+                      <svg width="110" height="110" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc" class="center">
+
+                         <circle cx="125" cy="125" r="120" fill="rgba(0,0,0,0.15)" />
+                      </svg>
+                    </div>
+                    <div class="more-info">
+                      <h1> {{local.nom_Local}}</h1>
+                   
+                      <div class="coords">
+                        <span>Adresse</span>
+                        <span>{{local.adresse}}</span>
+                      </div>
+                      <div class="coords">
+                        <span>Responsable:</span>
+                        <span> {{local.responsable}}
+                        </span>
+                      </div>
+                      <div class="coords">
+                        <span>Surface</span>
+                        <span>{{local.surface}}</span>
+                      </div>
+                      <div class="coords">
+                        <span>Longeur</span>
+                        <span>{{local.adresse}}</span>
+                      </div>
+                      <div  class="text-right" (click)="openDialogInformationLocal(local)"> <u>Plus</u></div>
+                      <div class="stats">
+                        <div>
+                          <div class="title">Telephone</div>
+                          <i class="fa fa-phone"></i>
+                          <div class="value">{{local.tel}}</div>
+                        </div>
+                        <div>
+                          <div class="title">Email</div>
+                          <i class="fa fa-envelope"></i>
+                          <div class="value">{{local.email}}</div>
+                        </div>
+                      
+                      
+                      </div>
+                    </div>
+                  </div>
+                  <div class="general">
+                    <h1>{{local.nom_Local}}</h1>
+                    <p>{{local.description_Local}}</p>
+                    <span class="more">Passez la souris sur la carte pour plus d'informations</span>
+                  </div>
+                </div> -->
+ 
+
+      <div class="card-body ">
+        <div class="main-card mb-3 card ">
+          <div class="card-header ">Depot {{i+1}}: {{local.nom_Local}} </div>
+          <div class="card-body">
+            Responsable : {{local.responsable}} <br>
+            Adresse : {{local.adresse}} <br>
+            Telephone :{{local.tel}} <br>
+            Surface : {{local.surface}}
+          </div>
+
+
+          <button class="btn btn-info" (click)="OpenEspaceTravail(local.id_Local)">
+            <img src="../../../../assets/wms-images/icon/modeliser.png" width="20" height="20">Modeliser</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  </form>

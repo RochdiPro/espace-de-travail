@@ -1,0 +1,123 @@
+#carre1 {
+    height: 20px;
+    width: 20px;
+    background: red;
+    cursor: pointer;
+
+   }
+   #carre2 {
+    height: 20px;
+    width: 20px;
+    background: LightGreen;
+    cursor: pointer;
+
+   }
+   #carre3 {
+    height: 20px;
+    width: 20px;
+    background: yellow;
+    cursor: pointer;
+
+   }
+   #hachure {
+    height: 23px;
+    width: 23px;
+    background-image: url("../../../../assets/wms-images/icon/hachur.png");
+    background-size: cover;
+    cursor: pointer;
+
+    
+   }
+   #reserve
+   {
+    height: 20px;
+    width: 20px;
+    background: blue;
+    cursor: pointer;
+
+    
+   }
+   #videRayon{
+
+    height: 90px;
+    width: 300px;
+    background: #ccd8ff;
+     cursor: pointer;
+   }
+#cartoEchelle{
+   background-color: blue;
+  color: red;
+  //transform : scale(0.7,0.7); /* Réduction */
+  transform-origin:top left;
+
+   }
+   #vide {
+    height: 23px;
+    width: 23px;
+    background: #ccd8ff;
+     cursor: pointer;
+
+    }
+    #rayon {
+      height: 23px;
+      width: 23px;
+      background: #ffffff;
+       cursor: pointer;
+  
+      }
+    
+   #depot
+   {
+    border: gainsboro;
+    border-style: solid;
+   }
+  
+   .un{
+    width: 20px;
+   }
+   .col-size {
+
+     border: gainsboro;
+    border-style: solid;
+
+  }
+ 
+  @media screen and (max-width: 640px) {
+    .bloc {
+      display:block;
+      clear:both;
+    }
+  }
+  @media screen and (min-width: 200px) and (max-width: 640px) {
+    .bloc {
+      display:block;
+      clear:both;
+    }
+  }  
+  .mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle{
+    border-color:rgb(66, 134, 244); 
+  }
+  
+  .mat-radio-button.mat-accent .mat-radio-inner-circle{
+    color:rgb(66, 134, 244);
+    background-color:rgb(66, 134, 244) ;
+  }
+  
+  .mat-radio-button.mat-accent .mat-radio-ripple .mat-ripple-element {
+      background-color:rgb(255, 37, 37,.26);
+  }
+
+  .coloir{
+    writing-mode: vertical-rl;
+    text-orientation: sideways;
+    transform: rotate(
+-180deg);
+  }
+
+ 
+ 
+.reset-button {
+  margin: 16px;
+  padding: 8px;
+}
+
