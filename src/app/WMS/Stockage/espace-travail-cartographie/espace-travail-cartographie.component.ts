@@ -11,6 +11,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
 }
+
 @Component({
   selector: 'app-espace-travail-cartographie',
   templateUrl: './espace-travail-cartographie.component.html',

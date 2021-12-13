@@ -50,6 +50,7 @@ import { MatRadioModule } from '@angular/material/radio';
     PortalModule,
      ColorPickerModule,
     FabricjsEditorModule,
+     
     MatRadioModule,
      
    ],

@@ -10,8 +10,10 @@
                 </div>
                 <div class="col-6">
                     <mat-radio-group color="primary"   [(ngModel)]="alignement" aria-label="Select an option">
-                        <mat-radio-button value="vertical">Vertical</mat-radio-button>
-                        <mat-radio-button value="horizental">Horizental</mat-radio-button>
+                        <mat-radio-button value="vertical">90°</mat-radio-button>
+                        <mat-radio-button value="horizental">-90°</mat-radio-button>
+                        <mat-radio-button value="45">45°</mat-radio-button>
+                        <mat-radio-button value="-45">-45°</mat-radio-button>
                     </mat-radio-group>
                 </div>
             </div>
@@ -23,6 +25,25 @@
                     <mat-radio-group color="primary"  [(ngModel)]="style" aria-label="Select an option">
                         <mat-radio-button value="simple">Simple</mat-radio-button>
                         <mat-radio-button value="pointee">Pointée</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-3">
+                    Direction:
+                </div>
+                <div class="col-6" *ngIf="alignement==='vertical'">
+                    <mat-radio-group color="primary"   [(ngModel)]="directionDG" aria-label="Select an option">
+                        <mat-radio-button value="gauche">Gauche</mat-radio-button>
+                        <mat-radio-button value="droite">Droite</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div class="col-6"  *ngIf="alignement==='horizental' ||alignement==='45'  ||alignement==='-45'">
+                    <mat-radio-group color="primary"   [(ngModel)]="directionHB" aria-label="Select an option">
+                        <mat-radio-button value="haut">Haut</mat-radio-button>
+                        <mat-radio-button value="bas">Bas</mat-radio-button>
                     </mat-radio-group>
                 </div>
             </div>

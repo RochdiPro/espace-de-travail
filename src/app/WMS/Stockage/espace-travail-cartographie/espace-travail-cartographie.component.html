@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-xl-12">
         <div class="row">
-            <div class="col-xl-12 text-right">
+            <div class="col-xl-12 ">
                 <button data-toggle="tooltip" data-placement="bottom" title="Export to image" type="button"
                     class="btn btn-primary" (click)="rasterize();">
                     <i class="fa fa-download" aria-hidden="true"></i> Exporter image</button>
@@ -173,50 +173,50 @@
                     </div>
 
 
+
+
+
+
+
+
+
                     <!-- ajouter image -->
                     <div class="item has_submenu" width="40px">
 
-                        <img (click)="openDialogImageEspace()" src="../../../../assets/wms-images/icon/img_down.png"
+                        <img (click)="openDialogImageEspace()" src="../../../../assets/wms-images/icon/images.png"
                             width="40px" height="40px">
 
                         <div class="submenu">
                             <div class="item">
                                 <div class="card-body max-height">
                                     <div class="row">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/camion0.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/forklift0.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/wc-.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/ouut0.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/extinc.svg">
+                                    
+                                    
+                                      
                                         <img class="images-item" (click)="getImgPolaroid($event)"
                                             src="../../../../../assets/wms-images/fabric/rec1.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/img1.svg">
+                                            src="../../../../assets/wms-images/fabric/img1.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/img2.svg">
+                                            src="../../../../assets/wms-images/fabric/img2.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/img3.svg">
+                                            src="../../../../assets/wms-images/fabric/img3.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/img4.svg">
+                                            src="../../../../assets/wms-images/fabric/img4.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/img5.svg">
+                                            src="../../../../assets/wms-images/fabric/img5.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/img6.svg">
+                                            src="../../../../assets/wms-images/fabric/img6.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/img7.svg">
+                                            src="../../../../assets/wms-images/fabric/img7.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/img8.svg">
+                                            src="../../../../assets/wms-images/fabric/img8.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/img9.svg">
+                                            src="../../../../assets/wms-images/fabric/img9.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/img10.svg">
+                                            src="../../../../assets/wms-images/fabric/img10.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/img11.svg">
+                                            src="../../../../assets/wms-images/fabric/img11.svg">
                                     </div>
 
                                 </div>
@@ -271,6 +271,19 @@
                 <div class="card-body text-center">
                     <div class="btn-group" role="group" aria-label="...">
                         <button data-toggle="tooltip" data-placement="bottom" title="Delete element" type="button"
+                            class="btn btn-outline-primary" >
+                            <i class="fa fa-undo" aria-hidden="true"></i>
+                        </button>
+                        <button data-toggle="tooltip" data-placement="bottom" title="Send to back" type="button"
+                            class="btn btn-outline-primary" >
+                            <i class="fa fa-redo" aria-hidden="true"></i>
+                        </button>
+                      
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <div class="btn-group" role="group" aria-label="...">
+                        <button data-toggle="tooltip" data-placement="bottom" title="Delete element" type="button"
                             class="btn btn-outline-danger" [disabled]="!canvas.selected" (click)="removeSelected();">
                             <i class="fa fa-trash" aria-hidden="true"></i>
                         </button>
@@ -293,6 +306,7 @@
                         </button>
                     </div>
                 </div>
+              
 
             </div>
             <br />

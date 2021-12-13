@@ -7,6 +7,8 @@ import { fabric } from 'fabric';
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
 }
+import 'fabric-history';
+ 
 @Component({
   selector: 'angular-editor-fabric-js',
   templateUrl: './angular-editor-fabric-js.component.html',
@@ -60,7 +62,15 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
   constructor(private sanitizer: DomSanitizer,private service: StockageService, private route: ActivatedRoute,
     private elementRef: ElementRef) {
     this.idLocal = this.route.snapshot.params['id'];
-    }
+
+    const canv = new fabric.Canvas(document.querySelector('canvas'), {
+      isDrawingMode: true
+    })
+    canv.undo()
+
+  
+  
+  }
     private scale = 1;
     private translate: [number, number] = [0, 0];
     private translateOnPanStart: [number, number] = [0, 0];
@@ -169,6 +179,8 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
       selection: true,
       selectionBorderColor: 'blue'
     });
+    
+
 
  
     this.canvas.on({
@@ -388,6 +400,24 @@ removeWhiteback(url:any) {
           }
                );
       break;
+      case 'lineinclinpostive':
+            add=new fabric.Line([50, 100, 200, 200], {
+                left: 170,
+                angle: 101,
+                top: 150,
+                stroke: 'black'
+            }
+                 );
+        break;
+        case 'lineinclinnegative':
+          add=new fabric.Line([50, 100, 200, 200], {
+              left: 170,
+              angle: 11,
+              top: 150,
+              stroke: 'black'
+          }
+               );
+      break;
         case 'dottedHorizental':
          add= new fabric.Line([50, 100, 200, 200], {
             left: 170,
@@ -398,16 +428,34 @@ removeWhiteback(url:any) {
         });
         
       break;
-      case 'dottedvertical':
+      
+       case 'dottedvertical':
         add= new fabric.Line([50, 100, 200, 200], {
            left: 170,
-           angle: 56,
+           angle: 11,
            top: 150,
            strokeDashArray: [5, 5],
            stroke: 'black'
        });
        
      break;
+     case 'dottedinclinpositive':
+      add= new fabric.Line([50, 100, 200, 200], {
+         left: 170,
+         angle: 101,
+         top: 150,
+         strokeDashArray: [5, 5],
+         stroke: 'black'
+     });     
+     break;
+     case 'dottedHorizentalinlinnegative':
+      add= new fabric.Line([50, 100, 200, 200], {
+         left: 170,
+         angle: 56,
+         top: 150,
+         strokeDashArray: [5, 5],
+         stroke: 'black'
+     }); 
     }
     this.extend(add, this.randomId());
     this.canvas.add(add);
@@ -832,7 +880,7 @@ setCanvasImageBack(url:any) {
 			this.setLineControls(line);
 			return line;
 		}
-   addArrowVerticale()
+   addArrowVerticaleDroite()
   {
     var pts = [100,100,100,200];
     var triangle = this.createArrowHead(pts);
@@ -844,7 +892,19 @@ setCanvasImageBack(url:any) {
     // setLineControls(arrow);
     // canvas.add(arrow);
   }
-  addArrowHorizentale()
+  addArrowVerticaleGauche()
+  {
+    var pts = [100,100,100,200];
+    var triangle = this.createArrowHead(pts);
+    var line = this.createLine(pts);
+    var grp = new fabric.Group([triangle,line]);			
+     this.setLineControls(grp);
+    this.canvas.add(grp);
+    // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
+    // setLineControls(arrow);
+    // canvas.add(arrow);
+  }
+  addArrowHorizentaleDroite()
   {
     var pts = [100,100,100,200];
     var triangle = this.createArrowHead(pts);
@@ -857,7 +917,20 @@ setCanvasImageBack(url:any) {
     // setLineControls(arrow);
     // canvas.add(arrow);
   }
-  addDottedArrowVerticale()
+  addArrowHorizentaleGauche()
+  {
+    var pts = [100,100,100,200];
+    var triangle = this.createArrowHead(pts);
+    var line = this.createLine(pts);
+    var grp = new fabric.Group([triangle,line]);			
+     grp.angle=90;
+    this.setLineControls(grp);
+    this.canvas.add(grp);
+    // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
+    // setLineControls(arrow);
+    // canvas.add(arrow);
+  }
+  addDottedArrowVerticaleGauche()
   {
     var pts = [100,100,100,200];
     var triangle = this.createArrowHead(pts);
@@ -869,7 +942,32 @@ setCanvasImageBack(url:any) {
     // setLineControls(arrow);
     // canvas.add(arrow);
   }
-  addDottedArrowHorizentale()
+  addDottedArrowDroite()
+  {
+    var pts = [100,100,100,200];
+    var triangle = this.createArrowHead(pts);
+    var line = this.createDottedLine(pts);
+    var grp = new fabric.Group([triangle,line]);			
+     this.setLineControls(grp);
+    this.canvas.add(grp);
+    // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
+    // setLineControls(arrow);
+    // canvas.add(arrow);
+  }
+  addDottedArrowHorizentaleGauche()
+  {
+    var pts = [100,100,100,200];
+    var triangle = this.createArrowHead(pts);
+    var line = this.createDottedLine(pts);
+    var grp = new fabric.Group([triangle,line]);			
+     grp.angle=90;
+    this.setLineControls(grp);
+    this.canvas.add(grp);
+    // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
+    // setLineControls(arrow);
+    // canvas.add(arrow);
+  }
+  addDottedArrowHorizentaleDroite()
   {
     var pts = [100,100,100,200];
     var triangle = this.createArrowHead(pts);

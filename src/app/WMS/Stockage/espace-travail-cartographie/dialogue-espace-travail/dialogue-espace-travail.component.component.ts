@@ -4,9 +4,9 @@ import { FormBuilder } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { style } from '@angular/animations';
- 
-  
- @Component({
+
+
+@Component({
   selector: 'app-dialogue-espace-travail',
   templateUrl: './dialogue-espace-travail.component.html',
   styleUrls: ['./dialogue-espace-travail.component.scss']
@@ -27,60 +27,80 @@ export class DialogueEspacaTravailComponent implements OnInit {
 export class ArrowEspaceTravailDialogComponent implements OnInit {
   ngOnInit(): void {
   }
-  alignement:string='vertical'
-  style:string='simple'
-  canvas:any
-   constructor(public dialogRef: MatDialogRef<ArrowEspaceTravailDialogComponent>,
+  alignement: string = 'vertical'
+  style: string = 'simple'
+  directionDG: string = 'gauche'
+  directionHB: string = 'haut'
+  canvas: any
+  constructor(public dialogRef: MatDialogRef<ArrowEspaceTravailDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private router: Router, private http: HttpClient) {
-  
-      this.canvas=data.canvas
+
+    this.canvas = data.canvas
+  }
+  public addArrowHorizentale() {
+    this.canvas.addArrowHorizentale();
+
+  }
+  public addArrowVerticale() {
+    this.canvas.addArrowVerticale();
+
+  }
+  public addDottedArrowHorizentale() {
+    this.canvas.addDottedArrowHorizentale();
+
+  }
+  public addDottedArrowVerticale() {
+    this.canvas.addDottedArrowVerticale();
+
+  }
+  onSubmit() {
+
+    //simple vertical
+    if ((this.style == 'simple') && (this.alignement == 'vertical') && (this.directionDG == 'gauche')) {
+      this.addArrowVerticale();
+      this.close()
     }
-    public addArrowHorizentale(){
-      this.canvas.addArrowHorizentale();
-      
+    if ((this.style == 'simple') && (this.alignement == 'vertical') && (this.directionDG == 'droite')) {
+      this.addArrowVerticale();
+      this.close()
     }
-    public addArrowVerticale(){
-      this.canvas.addArrowVerticale();
-      
+    //simple horizentale
+    if ((this.style == 'simple') && (this.alignement == 'horizental') && (this.directionDG == 'gauche')) {
+      this.addArrowHorizentale();
+      this.close();
     }
-    public addDottedArrowHorizentale(){
-      this.canvas.addDottedArrowHorizentale();
-      
+    if ((this.style == 'simple') && (this.alignement == 'horizental') && (this.directionDG == 'droite')) {
+      this.addArrowHorizentale();
+      this.close();
     }
-    public addDottedArrowVerticale(){
-      this.canvas.addDottedArrowVerticale();
-      
+
+    //pointée vertical
+    if ((this.style == 'pointee') && (this.alignement == 'vertical') && (this.directionDG == 'gauche')) {
+      this.addDottedArrowVerticale();
+      this.close();
     }
-    onSubmit() {
-   if((this.style=='simple')&&(this.alignement=='vertical'))
-   {
-     this.addArrowVerticale();
-     this.close()
-   }
-   if((this.style=='simple')&&(this.alignement=='horizental'))
-   {
-    this.addArrowHorizentale();
-    this.close();
-   }
-   if((this.style=='pointee')&&(this.alignement=='vertical'))
-   {
-     this.addDottedArrowVerticale();
-     this.close();
-   }
-   if((this.style=='pointee')&&(this.alignement=='horizental'))
-   {
-    this.addDottedArrowHorizentale();
-    this.close();
-   }
- 
+    if ((this.style == 'pointee') && (this.alignement == 'vertical') && (this.directionDG == 'droite')) {
+      this.addDottedArrowVerticale();
+      this.close();
     }
-    public addFigure(figure:any) {
-      this.canvas.addFigure(figure);
+    //pointée horizental
+    if ((this.style == 'pointee') && (this.alignement == 'horizental') && (this.directionDG == 'gauche')) {
+      this.addDottedArrowHorizentale();
+      this.close();
     }
-  
+    if ((this.style == 'pointee') && (this.alignement == 'horizental') && (this.directionDG == 'droite')) {
+      this.addDottedArrowHorizentale();
+      this.close();
+    }
+
+  }
+  public addFigure(figure: any) {
+    this.canvas.addFigure(figure);
+  }
+
   //fermer dialogue
   close() {
-   
+
     this.dialogRef.close();
   }
 }
@@ -92,45 +112,61 @@ export class ArrowEspaceTravailDialogComponent implements OnInit {
 export class LineEspaceTravailDialogComponent implements OnInit {
   ngOnInit(): void {
   }
-  canvas:any
-  alignement:string='vertical'
-  style:string='simple'
-   constructor(public dialogRef: MatDialogRef<ImageEspaceTravailDialogComponent>,
+  canvas: any
+  alignement: string = 'vertical'
+  style: string = 'simple'
+  constructor(public dialogRef: MatDialogRef<ImageEspaceTravailDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private router: Router, private http: HttpClient) {
-  
-      this.canvas=data.canvas
+
+    this.canvas = data.canvas
+  }
+
+  onSubmit() {
+
+    if ((this.style == 'simple') && (this.alignement == 'vertical')) {
+      this.addFigure('lineVerticale');
+      this.close()
+    }
+    if ((this.style == 'simple') && (this.alignement == 'horizental')) {
+      this.addFigure('lineHorizental')
+      this.close();
     }
 
-    onSubmit() {
-   
-      if((this.style=='simple')&&(this.alignement=='vertical'))
-      {
-         this.addFigure('lineVerticale');
-        this.close()
-      }
-      if((this.style=='simple')&&(this.alignement=='horizental'))
-      {
-       this.addFigure('lineHorizental')
-       this.close();
-      }
-      if((this.style=='pointee')&&(this.alignement=='vertical'))
-      {
-        this.addFigure('dottedvertical')
-        this.close();
-      }
-      if((this.style=='pointee')&&(this.alignement=='horizental'))
-      {
-       this.addFigure('dottedHorizental')
-       this.close();
-      }
+
+    if ((this.style == 'simple') && (this.alignement == '45')) {
+      this.addFigure('lineinclinpostive');
+      this.close()
     }
-    public addFigure(figure:any) {
-      this.canvas.addFigure(figure);
+    if ((this.style == 'simple') && (this.alignement == '-45')) {
+      this.addFigure('lineinclinnegative')
+      this.close();
     }
-  
+
+
+    if ((this.style == 'pointee') && (this.alignement == 'vertical')) {
+      this.addFigure('dottedvertical')
+      this.close();
+    }
+    if ((this.style == 'pointee') && (this.alignement == 'horizental')) {
+      this.addFigure('dottedHorizental')
+      this.close();
+    }
+    if ((this.style == 'pointee') && (this.alignement == '45')) {
+      this.addFigure('dottedinclinpositive')
+      this.close();
+    }
+    if ((this.style == 'pointee') && (this.alignement == '-45')) {
+      this.addFigure('dottedHorizentalinlinnegative')
+      this.close();
+    }
+  }
+  public addFigure(figure: any) {
+    this.canvas.addFigure(figure);
+  }
+
   //fermer dialogue
   close() {
-   
+
     this.dialogRef.close();
   }
 }
@@ -142,23 +178,23 @@ export class LineEspaceTravailDialogComponent implements OnInit {
 export class ImageEspaceTravailDialogComponent implements OnInit {
   ngOnInit(): void {
   }
-  canvas:any
-   constructor(public dialogRef: MatDialogRef<ImageEspaceTravailDialogComponent>,
+  canvas: any
+  constructor(public dialogRef: MatDialogRef<ImageEspaceTravailDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private router: Router, private http: HttpClient) {
-  
-      this.canvas=data.canvas
-    }
 
-    onSubmit() {
-   
- 
-    }
-    public getImgPolaroid(event:any) {
-      this.canvas.getImgPolaroid(event);
-    }
+    this.canvas = data.canvas
+  }
+
+  onSubmit() {
+
+
+  }
+  public getImgPolaroid(event: any) {
+    this.canvas.getImgPolaroid(event);
+  }
   //fermer dialogue
   close() {
-   
+
     this.dialogRef.close();
   }
 }
