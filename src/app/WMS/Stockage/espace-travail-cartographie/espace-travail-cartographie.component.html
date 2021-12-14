@@ -28,13 +28,13 @@
 <div class="row">
 
 
-    <div class="col-2" >
-        <div *ngIf="showTools">
+    <div class="col-1"  *ngIf="showTools" >
+        <div>
             <img src="../../../../assets/wms-images/icon/arrows_left_double.png" width="20px" height="20px"
                 (click)="hideTools()">
         </div>
 
-        <perfect-scrollbar style="max-height: 600px;" [config]="config" *ngIf="showTools">
+        <perfect-scrollbar style="max-height: 600px; max-width: 100px;" [config]="config" *ngIf="showTools">
             <div>
                 <!-- Taille canvans -->
                 <div class="taille">
@@ -93,13 +93,28 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="card-body">
+
+                        <img src="../../../../assets/wms-images/icon/cursor.png" width="40px" height="40px"
+                            (click)="cursor()">
+                             
+
+                    </div>
                     <!-- drawing -->
 
                     <div class="card-body">
 
                         <img src="../../../../assets/wms-images/icon/pencil.png" width="40px" height="40px"
                             (click)="drawLine()">
+                          
+                    </div>
+                    <div class="card-body">
 
+                        <img src="../../../../assets/wms-images/icon/gomme.png" width="40px" height="40px"
+                            (click)="earaser()">
+                      
+                           
                     </div>
 
 
@@ -150,16 +165,16 @@
                                             <img src="../../../../../assets/wms-images/icon/circle.png" width="30px"
                                                 height="30px">
                                         </button>
-                                      
+
                                     </div>
                                     <div class="row">
-                                        
 
-                                        <button type="button" class="btn btn-primary" (click)="openDialogLine()" >
+
+                                        <button type="button" class="btn btn-primary" (click)="openDialogLine()">
                                             <img src="../../../../../assets/wms-images/icon/trait.png" width="30px"
                                                 height="30px">
                                         </button>
-                                        <button type="button" class="btn btn-primary" (click)="openDialogArrow()" >
+                                        <button type="button" class="btn btn-primary" (click)="openDialogArrow()">
                                             <img src="../../../../../assets/wms-images/icon/arrow.png" width="30px"
                                                 height="30px">
                                         </button>
@@ -190,11 +205,10 @@
                             <div class="item">
                                 <div class="card-body max-height">
                                     <div class="row">
-                                    
-                                    
-                                      
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../../assets/wms-images/fabric/rec1.svg">
+
+
+
+
                                         <img class="images-item" (click)="getImgPolaroid($event)"
                                             src="../../../../assets/wms-images/fabric/img1.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
@@ -217,6 +231,8 @@
                                             src="../../../../assets/wms-images/fabric/img10.svg">
                                         <img class="images-item" (click)="getImgPolaroid($event)"
                                             src="../../../../assets/wms-images/fabric/img11.svg">
+                                        <img class="images-item" (click)="getImgPolaroid($event)"
+                                            src="../../../../assets/wms-images/fabric/img12.svg">
                                     </div>
 
                                 </div>
@@ -246,23 +262,22 @@
                 </div>
             </div>
         </perfect-scrollbar>
-     </div>
-
-   
-
-    <div class="col-xl-8"   >
-        <div *ngIf="!showTools">
-            <img src="../../../../assets/wms-images/icon/arrows_right_double.png" width="20px" height="20px"
-                (click)="showTool()">
-        </div>
-        <angular-editor-fabric-js
-         
-         #canvas  >
-        </angular-editor-fabric-js>
     </div>
 
 
 
+    <div class="col-xl-9">
+        <div *ngIf="!showTools">
+            <img src="../../../../assets/wms-images/icon/arrows_right_double.png" width="20px" height="20px"
+                (click)="showTool()">
+        </div>
+        <angular-editor-fabric-js #canvas>
+        </angular-editor-fabric-js>
+    </div>
+
+    <div *ngIf="!showTools">
+        <div class="col-4" ></div>
+        </div>
     <div class="col-xl-2">
         <perfect-scrollbar style="max-width: 700px; max-height: 600px;" [config]="config">
 
@@ -270,15 +285,15 @@
                 <div class="card-header">Options</div>
                 <div class="card-body text-center">
                     <div class="btn-group" role="group" aria-label="...">
-                        <button data-toggle="tooltip" data-placement="bottom" title="Delete element" type="button"
-                            class="btn btn-outline-primary" >
+                        <button id="undo" data-toggle="tooltip" data-placement="bottom" title="Delete element"
+                        [disabled]="canvas.noundo"    type="button" (click)="undo();" class="btn btn-outline-primary">
                             <i class="fa fa-undo" aria-hidden="true"></i>
                         </button>
-                        <button data-toggle="tooltip" data-placement="bottom" title="Send to back" type="button"
-                            class="btn btn-outline-primary" >
+                        <button id="redo" data-toggle="tooltip" data-placement="bottom" title="Send to back"
+                        [disabled]="canvas.noredo"   type="button" (click)="redo();" class="btn btn-outline-primary">
                             <i class="fa fa-redo" aria-hidden="true"></i>
                         </button>
-                      
+
                     </div>
                 </div>
                 <div class="card-body text-center">
@@ -306,7 +321,7 @@
                         </button>
                     </div>
                 </div>
-              
+
 
             </div>
             <br />

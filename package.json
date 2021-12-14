@@ -49,6 +49,7 @@
     "@angular/compiler-cli": "~11.0.4",
     "@types/fabric": "^4.5.5",
     "@types/jasmine": "~3.6.0",
+    "@types/jquery": "^3.5.10",
     "@types/node": "^12.20.24",
     "@types/xml2js": "^0.4.9",
     "codelyzer": "^6.0.0",

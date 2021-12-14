@@ -30,10 +30,10 @@ export class EspaceTravailCartographieComponent implements OnInit {
 idLocal:any
  local: Fiche_Local = new Fiche_Local()
 @ViewChild('canvas', {static: false}) canvas: FabricjsEditorComponent;
+ 
 title = 'angular-editor-fabric-js';
 showTools=true
-
-  constructor(private service: StockageService,
+   constructor(private service: StockageService,
     private route: ActivatedRoute,
     public dialog: MatDialog,
     private elementRef: ElementRef) {    
@@ -180,9 +180,10 @@ showTools=true
   public drawLine() {
     this.canvas.drawLine();
   }
-  public StopdrawLine() {
-    this.canvas.stopdrawLine()}
   
+    public cursor(){
+      this.canvas.cursor()
+    }
   public changeSize() {
     this.canvas.changeSize();
   }
@@ -252,10 +253,19 @@ public removeWhiteback(url:any) {
   public bringToFront() {
     this.canvas.bringToFront();
   }
+  public undo() {
+    this.canvas.undo();
+ 
+}
+// Redo Canvas Change
+public redo() {
+    this.canvas.redo();
 
+  };
   public clone() {
     this.canvas.clone();
   }
+  
 
   public cleanSelect() {
     this.canvas.cleanSelect();
@@ -310,7 +320,10 @@ public removeWhiteback(url:any) {
   public setFontSize() {
     this.canvas.setFontSize();
   }
-
+  public earaser() {
+    this.canvas.earaser();
+  }
+  
   public setLineHeight() {
     this.canvas.setLineHeight();
   }

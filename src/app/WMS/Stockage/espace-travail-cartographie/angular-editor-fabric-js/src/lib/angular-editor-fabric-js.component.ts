@@ -3,12 +3,13 @@ import { Component, ViewChild, ElementRef, AfterViewInit, AfterViewChecked, Host
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { fabric } from 'fabric';
- import { StockageService } from 'src/app/WMS/Stockage/services/stockage.service';
+import { StockageService } from 'src/app/WMS/Stockage/services/stockage.service';
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
 }
 import 'fabric-history';
- 
+import { Canvas } from 'fabric/fabric-impl';
+
 @Component({
   selector: 'angular-editor-fabric-js',
   templateUrl: './angular-editor-fabric-js.component.html',
@@ -24,9 +25,10 @@ import 'fabric-history';
 })
 export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked {
   @ViewChild('htmlCanvas') htmlCanvas: ElementRef;
-  idLocal:any
+  idLocal: any
   private canvas: fabric.Canvas;
-  public props:any = {
+
+  public props: any = {
     canvasFill: '#ffffff',
     canvasImage: '',
     canvasImageBack: '',
@@ -46,7 +48,8 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
   public textString: string;
   public url: string | ArrayBuffer = '';
   public urlback: string | ArrayBuffer = '';
-
+  public noredo:boolean=true
+  public noundo:boolean=true
   public size: any = {
     width: 900,
     height: 700
@@ -58,120 +61,117 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
   private imageEditor = false;
   public figureEditor = false;
   public selected: any;
-
-  constructor(private sanitizer: DomSanitizer,private service: StockageService, private route: ActivatedRoute,
+  undo_stack: any = []
+  redo_stack: any = []
+  pause_saving: boolean = false
+  constructor(private sanitizer: DomSanitizer, private service: StockageService, private route: ActivatedRoute,
     private elementRef: ElementRef) {
     this.idLocal = this.route.snapshot.params['id'];
 
-    const canv = new fabric.Canvas(document.querySelector('canvas'), {
-      isDrawingMode: true
-    })
-    canv.undo()
 
-  
-  
-  }
-    private scale = 1;
-    private translate: [number, number] = [0, 0];
-    private translateOnPanStart: [number, number] = [0, 0];
-  
-    transformAnimationState = {
-      value: null as number,
-      params: {
-        transform: 'scale(1)',
-        duration: '0s'
-      }
-    };
-  
-   
-    @HostListener('mousewheel', ['$event'])
-    onMouseWheel(e: any) {
-  
-      const currentScale = this.scale;
-      const newScale = clamp(this.scale + Math.sign(e.wheelDelta) / 10.0, 1, 3.0);
-      if (currentScale !== newScale) {
-  
-  
-        this.translate = this.calculateTranslationToZoomPoint(currentScale, newScale, this.translate, e);
-        this.scale = newScale;
-  
-        this.updateTransformAnimationState();
-      }
-     
-      e.preventDefault();
-    }
-  
-    private calculateTranslationToZoomPoint(currentScale: number, newScale: number, currentTranslation: [number, number],  e: {clientX: number, clientY: number}, ): [number, number] {
-        
-      const [eventLayerX, eventLayerY] = this.projectToLayer(e);
-  
-      const xAtCurrentScale = (eventLayerX - currentTranslation[0]) / currentScale;
-      const yAtCurrentScale = (eventLayerY - currentTranslation[1]) / currentScale;
-  
-      const xAtNewScale = xAtCurrentScale * newScale;
-      const yAtNewScale  = yAtCurrentScale * newScale;
-  
-      return [eventLayerX - xAtNewScale, eventLayerY - yAtNewScale];
-    }
-  
-    private projectToLayer(eventClientXY: {clientX: number, clientY: number}): [number, number] {
-      const layerX = Math.round(eventClientXY.clientX - this.clientX);
-      const layerY = Math.round(eventClientXY.clientY - this.clientY);
-      return [layerX, layerY];
-    }
-  
-    private get clientX() {
-      return (this.elementRef.nativeElement as HTMLElement).getBoundingClientRect().left;
-    }
-  
-    private get clientY() {
-      return (this.elementRef.nativeElement as HTMLElement).getBoundingClientRect().top;
-    }
-  
-    private updateTransformAnimationState(duration = '.5s') {
-      this.transformAnimationState = {
-        value: this.scale + this.translate[0] + this.translate[1],
-        params: {
-          transform: `translate3d(${this.translate[0]}px, ${this.translate[1]}px, 0px) scale(${this.scale})`,
-          duration
-        }
-      }
-    }
-  
-    reset() {
-      this.scale = 1;
-      this.translate = [0, 0];
-      this.updateTransformAnimationState();
-    }
-  
-    @HostListener('panstart', ['$event'])
-    onPanStart(e: Event) {
-      this.translateOnPanStart = [...this.translate] as [number, number];
-      e.preventDefault();
-    }
-  
-    @HostListener('pan', ['$event'])
-    onPan(e: Event & {deltaX: number, deltaY: number}) {
-      this.translate = [this.translateOnPanStart[0] + e.deltaX, this.translateOnPanStart[1] + e.deltaY];
-      this.updateTransformAnimationState('0s');
-      e.preventDefault();
-    }
-  
-    ngAfterViewChecked() {
-     }
-  ngAfterViewInit(): void {
-    var json = ''
  
 
-    
-    this.service.Detail_carto(this.idLocal).subscribe((detail: any) => {        
-       json = JSON.stringify(detail);
-     console.log(json)
+  }
+  private scale = 1;
+  private translate: [number, number] = [0, 0];
+  private translateOnPanStart: [number, number] = [0, 0];
 
-     this.canvas.loadFromJSON(json, this.canvas.renderAll.bind(this.canvas), function(o:any, object:any) {
-      fabric.log(o, object);
-  });
-  })
+  transformAnimationState = {
+    value: null as number,
+    params: {
+      transform: 'scale(1)',
+      duration: '0s'
+    }
+  };
+
+
+  @HostListener('mousewheel', ['$event'])
+  onMouseWheel(e: any) {
+
+    const currentScale = this.scale;
+    const newScale = clamp(this.scale + Math.sign(e.wheelDelta) / 10.0, 1, 3.0);
+    if (currentScale !== newScale) {
+
+
+      this.translate = this.calculateTranslationToZoomPoint(currentScale, newScale, this.translate, e);
+      this.scale = newScale;
+
+      this.updateTransformAnimationState();
+    }
+
+    e.preventDefault();
+  }
+
+  private calculateTranslationToZoomPoint(currentScale: number, newScale: number, currentTranslation: [number, number], e: { clientX: number, clientY: number },): [number, number] {
+
+    const [eventLayerX, eventLayerY] = this.projectToLayer(e);
+
+    const xAtCurrentScale = (eventLayerX - currentTranslation[0]) / currentScale;
+    const yAtCurrentScale = (eventLayerY - currentTranslation[1]) / currentScale;
+
+    const xAtNewScale = xAtCurrentScale * newScale;
+    const yAtNewScale = yAtCurrentScale * newScale;
+
+    return [eventLayerX - xAtNewScale, eventLayerY - yAtNewScale];
+  }
+
+  private projectToLayer(eventClientXY: { clientX: number, clientY: number }): [number, number] {
+    const layerX = Math.round(eventClientXY.clientX - this.clientX);
+    const layerY = Math.round(eventClientXY.clientY - this.clientY);
+    return [layerX, layerY];
+  }
+
+  private get clientX() {
+    return (this.elementRef.nativeElement as HTMLElement).getBoundingClientRect().left;
+  }
+
+  private get clientY() {
+    return (this.elementRef.nativeElement as HTMLElement).getBoundingClientRect().top;
+  }
+
+  private updateTransformAnimationState(duration = '.5s') {
+    this.transformAnimationState = {
+      value: this.scale + this.translate[0] + this.translate[1],
+      params: {
+        transform: `translate3d(${this.translate[0]}px, ${this.translate[1]}px, 0px) scale(${this.scale})`,
+        duration
+      }
+    }
+  }
+
+  reset() {
+    this.scale = 1;
+    this.translate = [0, 0];
+    this.updateTransformAnimationState();
+  }
+
+  @HostListener('panstart', ['$event'])
+  onPanStart(e: Event) {
+    this.translateOnPanStart = [...this.translate] as [number, number];
+    e.preventDefault();
+  }
+
+  @HostListener('pan', ['$event'])
+  onPan(e: Event & { deltaX: number, deltaY: number }) {
+    this.translate = [this.translateOnPanStart[0] + e.deltaX, this.translateOnPanStart[1] + e.deltaY];
+    this.updateTransformAnimationState('0s');
+    e.preventDefault();
+  }
+
+
+
+  ngAfterViewChecked() {
+  }
+  ngAfterViewInit(): void {
+    var json = ''
+    //recuperer escpace travail pour local
+    this.service.Detail_carto(this.idLocal).subscribe((detail: any) => {
+      json = JSON.stringify(detail);
+      //load canvas from JSON
+      this.canvas.loadFromJSON(json, this.canvas.renderAll.bind(this.canvas), function (o: any, object: any) {
+        //fabric.log(o, object);
+      });
+    })
 
     // setup front side canvas
     this.canvas = new fabric.Canvas(this.htmlCanvas.nativeElement, {
@@ -179,18 +179,22 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
       selection: true,
       selectionBorderColor: 'blue'
     });
-    
 
-
- 
     this.canvas.on({
-      'object:moving': (e) => {      console.log("move")
-    },
-      'object:modified': (e) => {       console.log("modif")
-    },
+      'object:moving': (e) => {
+        console.log("move")
+      },
+      'object:modified': (e) => {
+      
+        console.log("modif")
+      },
+      'selection:updated': (e) => {
+       this.saveUndoRedo("Object udpate ")
+        console.log("udpate selection")
+      },
       'selection:created': (e) => {
         const selectedObject = e.target;
-        console.log("selectt",selectedObject.type)
+        console.log("selectt", selectedObject.type)
 
         this.selected = selectedObject;
         selectedObject.hasRotatingPoint = true;
@@ -203,7 +207,7 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
 
           this.getId();
           this.getOpacity();
-          console.log("selectt",selectedObject.type)
+          console.log("selectt", selectedObject.type)
 
           switch (selectedObject.type) {
             case 'rect':
@@ -225,35 +229,86 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
             case 'image':
               break;
           }
-      
+
         }
       },
       'selection:cleared': (e) => {
-        console.log("cleaar")
-
         this.selected = null;
         this.resetPanels();
-      }      
- 
+      },
+      'object:removed': (e) => {
+        console.log("remove")
+        this.saveUndoRedo("Object removed")
+        
+      },
+      'object:added': (e) => {
+      //  console.log(" aded")
+        this.saveUndoRedo("Object aded")
+      },
+      'path:created': (e) => {
+        console.log("path aded")
+      },
+
     }
- );
+    );
     this.canvas.setWidth(this.size.width);
     this.canvas.setHeight(this.size.height);
-
+    this.h=this.size.height
+    this.w=this.size.width
     // get references to the html canvas element & its context
     this.canvas.on('mouse:down', (e) => {
       const canvasElement: any = document.getElementById('canvas');
     });
+//Listen for undo/redo 
+
   
+  }
+  w:any
+  h:any
+ saveUndoRedo(string:any){
+    if (!this.pause_saving) {
+          this.undo_stack.push(JSON.stringify(this.canvas));
+        //  this.redo_stack = [];
+//console.log(string, this.undo_stack);
+//console.log(string);
+ if(this.undo_stack!=[])
+this.noundo=false
+if(this.redo_stack!=[])
+this.noredo=false 
+      } 
 
+}
 
+  undo() {
+    this.pause_saving = true;
+     this.redo_stack.push(this.undo_stack.pop());
+     let previous_state = this.undo_stack[this.undo_stack.length - 1];
+    if (previous_state == null) {
+      previous_state = '{}';
+    }
 
-
-
-
+    this.canvas.loadFromJSON(previous_state, this.canvas.renderAll.bind(this.canvas), function (o: any, object: any) {
+      
+    });
+    this.pause_saving = false;
 
   }
 
+  redo() {
+    console.log("redo")
+    console.log("state", this.redo_stack)
+
+    this.pause_saving = true;
+     let state = this.redo_stack.pop();
+    if (state != null) {
+
+      this.undo_stack.push(state);
+      this.canvas.loadFromJSON(state, this.canvas.renderAll.bind(this.canvas), function (o: any, object: any) {
+        
+      });
+      this.pause_saving = false;
+    }
+  }
 
   /*------------------------Block elements------------------------*/
 
@@ -309,7 +364,7 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
 
   // Block "Upload Image"
 
-  addImageOnCanvas(url:any) {
+  addImageOnCanvas(url: any) {
     if (url) {
       fabric.Image.fromURL(url, (image) => {
         image.set({
@@ -329,7 +384,7 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
     }
   }
 
-  readUrl(event:any) {
+  readUrl(event: any) {
     if (event.target.files && event.target.files[0]) {
       const reader = new FileReader();
       reader.onload = (readerEvent) => {
@@ -339,7 +394,7 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
     }
   }
 
-  readUrlBack(event:any) {
+  readUrlBack(event: any) {
     if (event.target.files && event.target.files[0]) {
       const reader = new FileReader();
       reader.onload = (readerEvent) => {
@@ -349,15 +404,15 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
     }
   }
 
-  removeWhite(url:any) {
+  removeWhite(url: any) {
     this.url = '';
   }
-removeWhiteback(url:any) {
+  removeWhiteback(url: any) {
     this.urlback = '';
   }
   // Block "Add figure"
 
-  addFigure(figure:any) {
+  addFigure(figure: any) {
     let add: any;
     switch (figure) {
       case 'rectangle':
@@ -382,80 +437,80 @@ removeWhiteback(url:any) {
           radius: 50, left: 10, top: 10, fill: '#ff5722'
         });
         break;
-        case 'lineHorizental':
-            add=new fabric.Line([50, 100, 200, 200], {
-                left: 170,
-                angle: 327,
-                top: 150,
-                stroke: 'black'
-            }
-                 );
+      case 'lineHorizental':
+        add = new fabric.Line([50, 100, 200, 200], {
+          left: 170,
+          angle: 327,
+          top: 150,
+          stroke: 'black'
+        }
+        );
         break;
-        case 'lineVerticale':
-          add=new fabric.Line([50, 100, 200, 200], {
-              left: 170,
-              angle: 56,
-              top: 150,
-              stroke: 'black'
-          }
-               );
-      break;
+      case 'lineVerticale':
+        add = new fabric.Line([50, 100, 200, 200], {
+          left: 170,
+          angle: 56,
+          top: 150,
+          stroke: 'black'
+        }
+        );
+        break;
       case 'lineinclinpostive':
-            add=new fabric.Line([50, 100, 200, 200], {
-                left: 170,
-                angle: 101,
-                top: 150,
-                stroke: 'black'
-            }
-                 );
+        add = new fabric.Line([50, 100, 200, 200], {
+          left: 170,
+          angle: 101,
+          top: 150,
+          stroke: 'black'
+        }
+        );
         break;
-        case 'lineinclinnegative':
-          add=new fabric.Line([50, 100, 200, 200], {
-              left: 170,
-              angle: 11,
-              top: 150,
-              stroke: 'black'
-          }
-               );
-      break;
-        case 'dottedHorizental':
-         add= new fabric.Line([50, 100, 200, 200], {
-            left: 170,
-            angle: 327,
-            top: 150,
-            strokeDashArray: [5, 5],
-            stroke: 'black'
+      case 'lineinclinnegative':
+        add = new fabric.Line([50, 100, 200, 200], {
+          left: 170,
+          angle: 11,
+          top: 150,
+          stroke: 'black'
+        }
+        );
+        break;
+      case 'dottedHorizental':
+        add = new fabric.Line([50, 100, 200, 200], {
+          left: 170,
+          angle: 327,
+          top: 150,
+          strokeDashArray: [5, 5],
+          stroke: 'black'
         });
-        
-      break;
-      
-       case 'dottedvertical':
-        add= new fabric.Line([50, 100, 200, 200], {
-           left: 170,
-           angle: 11,
-           top: 150,
-           strokeDashArray: [5, 5],
-           stroke: 'black'
-       });
-       
-     break;
-     case 'dottedinclinpositive':
-      add= new fabric.Line([50, 100, 200, 200], {
-         left: 170,
-         angle: 101,
-         top: 150,
-         strokeDashArray: [5, 5],
-         stroke: 'black'
-     });     
-     break;
-     case 'dottedHorizentalinlinnegative':
-      add= new fabric.Line([50, 100, 200, 200], {
-         left: 170,
-         angle: 56,
-         top: 150,
-         strokeDashArray: [5, 5],
-         stroke: 'black'
-     }); 
+
+        break;
+
+      case 'dottedvertical':
+        add = new fabric.Line([50, 100, 200, 200], {
+          left: 170,
+          angle: 11,
+          top: 150,
+          strokeDashArray: [5, 5],
+          stroke: 'black'
+        });
+
+        break;
+      case 'dottedinclinpositive':
+        add = new fabric.Line([50, 100, 200, 200], {
+          left: 170,
+          angle: 101,
+          top: 150,
+          strokeDashArray: [5, 5],
+          stroke: 'black'
+        });
+        break;
+      case 'dottedHorizentalinlinnegative':
+        add = new fabric.Line([50, 100, 200, 200], {
+          left: 170,
+          angle: 56,
+          top: 150,
+          strokeDashArray: [5, 5],
+          stroke: 'black'
+        });
     }
     this.extend(add, this.randomId());
     this.canvas.add(add);
@@ -463,12 +518,108 @@ removeWhiteback(url:any) {
   }
 
   /*Canvas*/
+  earaser() {
+    const ErasedGroup = fabric.util.createClass(fabric.Group, {
+      original: null,
+      erasedPath: null,
+      initialize: function (original: any, erasedPath: any, options: any, isAlreadyGrouped: any) {
+        this.original = original;
+        this.erasedPath = erasedPath;
+        this.callSuper('initialize', [this.original, this.erasedPath], options, isAlreadyGrouped);
+      },
+      _calcBounds: function (onlyWidthHeight: any) {
+        const aX = [],
+          aY = [],
+          props = ['tr', 'br', 'bl', 'tl'],
+          jLen = props.length,
+          ignoreZoom = true;
+    
+        let o = this.original;
+        o.setCoords(ignoreZoom);
+        for (let j = 0; j < jLen; j++) {
+         let  prop = props[j];
+          aX.push(o.oCoords[prop].x);
+          aY.push(o.oCoords[prop].y);
+        }
+    
+        this._getBounds(aX, aY, onlyWidthHeight);
+      },
+    });
+ 
+    const EraserBrush = fabric.util.createClass(fabric.PencilBrush, {
 
+      _finalizeAndAddPath: function () {
+        var ctx = this.canvas.contextTop;
+        ctx.closePath();
+        if (this.decimate) {
+          this._points = this.decimatePoints(this._points, this.decimate);
+        }
+        var pathData = this.convertPointsToSVGPath(this._points).join('');
+        if (pathData === 'M 0 0 Q 0 0 0 0 L 0 0') {
+       
+          this.canvas.requestRenderAll();
+          return;
+        }
+    
+        // use globalCompositeOperation to 'fake' eraser
+        var path = this.createPath(pathData);
+        path.globalCompositeOperation = 'destination-out';
+        path.selectable = false;
+        path.evented = false;
+        path.absolutePositioned = true;
+    
+        // grab all the objects that intersects with the path
+        const objects = this.canvas.getObjects().filter((obj:any) => {
+          // if (obj instanceof fabric.Textbox) return false;
+          // if (obj instanceof fabric.IText) return false;
+          if (!obj.intersectsWithObject(path)) return false;
+          return true;
+        });
+    
+        if (objects.length > 0) {
+    
+          // merge those objects into a group
+          const mergedGroup = new fabric.Group(objects);
+    
+          const newPath = new ErasedGroup(mergedGroup, path);
+    
+          const left = newPath.left;
+          const top = newPath.top;
+    
+          // convert it into a dataURL, then back to a fabric image
+          const newData = newPath.toDataURL({
+            withoutTransform: true
+          });
+          fabric.Image.fromURL(newData, (fabricImage) => {
+            fabricImage.set({
+              left: left,
+              top: top,
+            });
+    
+            // remove the old objects then add the new image
+            this.canvas.remove(...objects);
+            this.canvas.add(fabricImage);
+          });
+        }
+    
+        this.canvas.clearContext(this.canvas.contextTop);
+        this.canvas.renderAll();
+        this._resetShadow();
+      },
+    });
+    // to use it, just set the brush
+    const eraserBrush = new EraserBrush(this.canvas);
+    eraserBrush.width = 10;
+    eraserBrush.color = this.canvas.backgroundColor;
+    this.canvas.freeDrawingBrush = eraserBrush;
+    this.canvas.isDrawingMode = true;
+  }
+ 
   cleanSelect() {
     this.canvas.discardActiveObject().renderAll();
   }
 
-  selectItemAfterAdded(obj:any) {
+  selectItemAfterAdded(obj: any) {
     this.canvas.discardActiveObject().renderAll();
     this.canvas.setActiveObject(obj);
   }
@@ -480,16 +631,16 @@ removeWhiteback(url:any) {
     }
   }
 
-  extend(obj:any, id:any) {
+  extend(obj: any, id: any) {
     obj.toObject = ((toObject) => {
-      return function(this:any) {
+      return function (this: any) {
         return fabric.util.object.extend(toObject.call(this), {
           id
         });
       };
     })(obj.toObject);
   }
-//arriere plan image
+  //arriere plan image
   setCanvasImage() {
     const self = this;
     if (this.props.canvasImage) {
@@ -499,21 +650,21 @@ removeWhiteback(url:any) {
       });
     }
   }
-//arriere plan image
-setCanvasImageBack(url:any) {
-//console.log("size",this.canvas.width)
-  //const self = this;
+  //arriere plan image
+  setCanvasImageBack(url: any) {
+    //console.log("size",this.canvas.width)
+    //const self = this;
     if (url) {
-      fabric.Image.fromURL(url,  (img) => {          
+      fabric.Image.fromURL(url, (img) => {
         this.canvas.setBackgroundImage(img, this.canvas.renderAll.bind(this.canvas), {
-         // scaleX: this.canvas.width / img.width,
-         // scaleY: this.canvas.height / img.height
-    
+           scaleX: this.w / img.width,
+           scaleY: this.h / img.height
+
         });
-    });
+      });
 
     }
-}
+  }
 
   randomId() {
     return Math.floor(Math.random() * 999999) + 1;
@@ -521,7 +672,7 @@ setCanvasImageBack(url:any) {
 
   /*------------------------Global actions for element------------------------*/
 
-  getActiveStyle(styleName:any, object:any) {
+  getActiveStyle(styleName: any, object: any) {
     object = object || this.canvas.getActiveObject();
     if (!object) { return ''; }
 
@@ -532,31 +683,31 @@ setCanvasImageBack(url:any) {
     }
   }
 
-  setActiveStyle(styleName:any, value: string | number, object: fabric.IText) {
+  setActiveStyle(styleName: any, value: string | number, object: fabric.IText) {
     object = object || this.canvas.getActiveObject() as fabric.IText;
     if (!object) { return; }
 
     if (object.setSelectionStyles && object.isEditing) {
-      const style:any = {};
+      const style: any = {};
       style[styleName] = value;
 
       if (typeof value === 'string') {
         if (value.includes('underline')) {
-          object.setSelectionStyles({underline: true});
+          object.setSelectionStyles({ underline: true });
         } else {
-          object.setSelectionStyles({underline: false});
+          object.setSelectionStyles({ underline: false });
         }
 
         if (value.includes('overline')) {
-          object.setSelectionStyles({overline: true});
+          object.setSelectionStyles({ overline: true });
         } else {
-          object.setSelectionStyles({overline: false});
+          object.setSelectionStyles({ overline: false });
         }
 
         if (value.includes('line-through')) {
-          object.setSelectionStyles({linethrough: true});
+          object.setSelectionStyles({ linethrough: true });
         } else {
-          object.setSelectionStyles({linethrough: false});
+          object.setSelectionStyles({ linethrough: false });
         }
       }
 
@@ -566,7 +717,7 @@ setCanvasImageBack(url:any) {
     } else {
       if (typeof value === 'string') {
         if (value.includes('underline')) {
-        object.set('underline', true);
+          object.set('underline', true);
         } else {
           object.set('underline', false);
         }
@@ -592,14 +743,14 @@ setCanvasImageBack(url:any) {
   }
 
 
-  getActiveProp(name:any) {
-    const object:any = this.canvas.getActiveObject();
+  getActiveProp(name: any) {
+    const object: any = this.canvas.getActiveObject();
     if (!object) { return ''; }
 
     return object[name] || '';
   }
 
-  setActiveProp(name:any, value:any) {
+  setActiveProp(name: any, value: any) {
     const object = this.canvas.getActiveObject();
     if (!object) { return; }
     object.set(name, value).setCoords();
@@ -713,7 +864,7 @@ setCanvasImageBack(url:any) {
     this.props.TextDecoration = this.getActiveStyle('textDecoration', null);
   }
 
-  setTextDecoration(value:any) {
+  setTextDecoration(value: any) {
     let iclass = this.props.TextDecoration;
     if (iclass.includes(value)) {
       iclass = iclass.replace(RegExp(value, 'g'), '');
@@ -724,7 +875,7 @@ setCanvasImageBack(url:any) {
     this.setActiveStyle('textDecoration', this.props.TextDecoration, null);
   }
 
-  hasTextDecoration(value:any) {
+  hasTextDecoration(value: any) {
     return this.props.TextDecoration.includes(value);
   }
 
@@ -732,7 +883,7 @@ setCanvasImageBack(url:any) {
     this.props.textAlign = this.getActiveProp('textAlign');
   }
 
-  setTextAlign(value:any) {
+  setTextAlign(value: any) {
     this.props.textAlign = value;
     this.setActiveProp('textAlign', this.props.textAlign);
   }
@@ -763,6 +914,7 @@ setCanvasImageBack(url:any) {
       });
     }
   }
+
 
   bringToFront() {
     const activeObject = this.canvas.getActiveObject();
@@ -800,226 +952,203 @@ setCanvasImageBack(url:any) {
       this.canvas.clear();
     }
   }
+  isDown = false;
   drawLine() {
-    var line:any, isDown:any;
-
-    this.canvas.on('mouse:down', (o) =>{
-      isDown = true;
-      var pointer = this.canvas.getPointer(o.e);
-      var points = [ pointer.x, pointer.y, pointer.x, pointer.y ];
-      line = new fabric.Line(points, {
-        strokeWidth: 5,
-        fill: 'red',
-        stroke: 'red',
-        originX: 'center',
-        originY: 'center'
-      });
-      this.canvas.add(line);
-    });
+    this.canvas.isDrawingMode = true;
+    this.canvas.freeDrawingBrush.width = 5;
+    this.canvas.freeDrawingBrush.color = 'black';
     
-    this.canvas.on('mouse:move', (o) =>{
-      if (!isDown) return;
-      var pointer = this.canvas.getPointer(o.e);
-      line.set({ x2: pointer.x, y2: pointer.y });
-      this.canvas.renderAll();
-    });
-    
-    this.canvas.on('mouse:up', function(o){
-      isDown = false;
+    this.canvas.on('path:created', (e) => {
       
-    });
-  }
-  stopdrawLine() {
-    console.log('stop')
+       this.canvas.renderAll();
+  });
+}
  
-     this.canvas.hoverCursor= 'pointer',
-    this.canvas.selection=true
-     
+  
+  stopdrawLine() {
+
+    console.log('stop')
+   // this.isDown = false
+    this.canvas.isDrawingMode = false
+  }
+  cursor() {
+
+    console.log('stop')
+   // this.isDown = false
+    this.canvas.isDrawingMode = false
   }
   rasterize() {
     const image = new Image();
-    image.src = this.canvas.toDataURL({format: 'png'});
+    image.src = this.canvas.toDataURL({ format: 'png' });
     const w = window.open('');
     w.document.write(image.outerHTML);
   }
-   setLineControls(line:any)
-  {
-    line.setControlVisible("tr",false);
-    line.setControlVisible("tl",false);
-    line.setControlVisible("br",false);
-    line.setControlVisible("bl",false);
-    line.setControlVisible("ml",false);
-    line.setControlVisible("mr",false);
+  setLineControls(line: any) {
+    line.setControlVisible("tr", false);
+    line.setControlVisible("tl", false);
+    line.setControlVisible("br", false);
+    line.setControlVisible("bl", false);
+    line.setControlVisible("ml", false);
+    line.setControlVisible("mr", false);
   }
-   createLine(points:any)
-		{
-			var line = new fabric.Line(points,
-			{
-				strokeWidth: 3,
-				stroke: 'black',
-				originX: 'center',
-				originY: 'center',
-				lockScalingX:true,
- 				//lockScalingY:false,
-			});
-			this.setLineControls(line);
-			return line;
-		}
-    createDottedLine(points:any)
-		{
-			var line = new fabric.Line(points,
-			{
-				strokeWidth: 3,
-				stroke: 'black',
-				originX: 'center',
-				originY: 'center',
-				lockScalingX:true,
+  createLine(points: any) {
+    var line = new fabric.Line(points,
+      {
+        strokeWidth: 3,
+        stroke: 'black',
+        originX: 'center',
+        originY: 'center',
+        lockScalingX: true,
+        //lockScalingY:false,
+      });
+    this.setLineControls(line);
+    return line;
+  }
+  createDottedLine(points: any) {
+    var line = new fabric.Line(points,
+      {
+        strokeWidth: 3,
+        stroke: 'black',
+        originX: 'center',
+        originY: 'center',
+        lockScalingX: true,
         strokeDashArray: [5, 5],
-				//lockScalingY:false,
-			});
-			this.setLineControls(line);
-			return line;
-		}
-   addArrowVerticaleDroite()
-  {
-    var pts = [100,100,100,200];
-    var triangle = this.createArrowHead(pts);
-    var line = this.createLine(pts);
-    var grp = new fabric.Group([triangle,line]);			
-     this.setLineControls(grp);
-    this.canvas.add(grp);
-    // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
-    // setLineControls(arrow);
-    // canvas.add(arrow);
+        //lockScalingY:false,
+      });
+    this.setLineControls(line);
+    return line;
   }
-  addArrowVerticaleGauche()
-  {
-    var pts = [100,100,100,200];
+  addArrowVerticaleDroite() {
+    var pts = [100, 100, 100, 200];
     var triangle = this.createArrowHead(pts);
     var line = this.createLine(pts);
-    var grp = new fabric.Group([triangle,line]);			
-     this.setLineControls(grp);
-    this.canvas.add(grp);
-    // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
-    // setLineControls(arrow);
-    // canvas.add(arrow);
-  }
-  addArrowHorizentaleDroite()
-  {
-    var pts = [100,100,100,200];
-    var triangle = this.createArrowHead(pts);
-    var line = this.createLine(pts);
-    var grp = new fabric.Group([triangle,line]);			
-     grp.angle=90;
+    var grp = new fabric.Group([triangle, line]);
     this.setLineControls(grp);
     this.canvas.add(grp);
     // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
     // setLineControls(arrow);
     // canvas.add(arrow);
   }
-  addArrowHorizentaleGauche()
-  {
-    var pts = [100,100,100,200];
+  addArrowVerticaleGauche() {
+    var pts = [100, 100, 100, 200];
     var triangle = this.createArrowHead(pts);
     var line = this.createLine(pts);
-    var grp = new fabric.Group([triangle,line]);			
-     grp.angle=90;
+    var grp = new fabric.Group([triangle, line]);
     this.setLineControls(grp);
     this.canvas.add(grp);
     // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
     // setLineControls(arrow);
     // canvas.add(arrow);
   }
-  addDottedArrowVerticaleGauche()
-  {
-    var pts = [100,100,100,200];
+  addArrowHorizentaleDroite() {
+    var pts = [100, 100, 100, 200];
     var triangle = this.createArrowHead(pts);
-    var line = this.createDottedLine(pts);
-    var grp = new fabric.Group([triangle,line]);			
-     this.setLineControls(grp);
-    this.canvas.add(grp);
-    // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
-    // setLineControls(arrow);
-    // canvas.add(arrow);
-  }
-  addDottedArrowDroite()
-  {
-    var pts = [100,100,100,200];
-    var triangle = this.createArrowHead(pts);
-    var line = this.createDottedLine(pts);
-    var grp = new fabric.Group([triangle,line]);			
-     this.setLineControls(grp);
-    this.canvas.add(grp);
-    // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
-    // setLineControls(arrow);
-    // canvas.add(arrow);
-  }
-  addDottedArrowHorizentaleGauche()
-  {
-    var pts = [100,100,100,200];
-    var triangle = this.createArrowHead(pts);
-    var line = this.createDottedLine(pts);
-    var grp = new fabric.Group([triangle,line]);			
-     grp.angle=90;
+    var line = this.createLine(pts);
+    var grp = new fabric.Group([triangle, line]);
+    grp.angle = 90;
     this.setLineControls(grp);
     this.canvas.add(grp);
     // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
     // setLineControls(arrow);
     // canvas.add(arrow);
   }
-  addDottedArrowHorizentaleDroite()
-  {
-    var pts = [100,100,100,200];
+  addArrowHorizentaleGauche() {
+    var pts = [100, 100, 100, 200];
     var triangle = this.createArrowHead(pts);
-    var line = this.createDottedLine(pts);
-    var grp = new fabric.Group([triangle,line]);			
-     grp.angle=90;
+    var line = this.createLine(pts);
+    var grp = new fabric.Group([triangle, line]);
+    grp.angle = 90;
     this.setLineControls(grp);
     this.canvas.add(grp);
     // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
     // setLineControls(arrow);
     // canvas.add(arrow);
   }
-   createArrowHead(points:any)
-		{
-			var headLength = 15,
+  addDottedArrowVerticaleGauche() {
+    var pts = [100, 100, 100, 200];
+    var triangle = this.createArrowHead(pts);
+    var line = this.createDottedLine(pts);
+    var grp = new fabric.Group([triangle, line]);
+    this.setLineControls(grp);
+    this.canvas.add(grp);
+    // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
+    // setLineControls(arrow);
+    // canvas.add(arrow);
+  }
+  addDottedArrowDroite() {
+    var pts = [100, 100, 100, 200];
+    var triangle = this.createArrowHead(pts);
+    var line = this.createDottedLine(pts);
+    var grp = new fabric.Group([triangle, line]);
+    this.setLineControls(grp);
+    this.canvas.add(grp);
+    // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
+    // setLineControls(arrow);
+    // canvas.add(arrow);
+  }
+  addDottedArrowHorizentaleGauche() {
+    var pts = [100, 100, 100, 200];
+    var triangle = this.createArrowHead(pts);
+    var line = this.createDottedLine(pts);
+    var grp = new fabric.Group([triangle, line]);
+    grp.angle = 90;
+    this.setLineControls(grp);
+    this.canvas.add(grp);
+    // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
+    // setLineControls(arrow);
+    // canvas.add(arrow);
+  }
+  addDottedArrowHorizentaleDroite() {
+    var pts = [100, 100, 100, 200];
+    var triangle = this.createArrowHead(pts);
+    var line = this.createDottedLine(pts);
+    var grp = new fabric.Group([triangle, line]);
+    grp.angle = 90;
+    this.setLineControls(grp);
+    this.canvas.add(grp);
+    // var arrow = new fabric.LineArrow(pts,{left:100,top:100,fill:color()});
+    // setLineControls(arrow);
+    // canvas.add(arrow);
+  }
+  createArrowHead(points: any) {
+    var headLength = 15,
 
-					x1 = points[0],
-					y1 = points[1],
-					x2 = points[2],
-					y2 = points[3],
+      x1 = points[0],
+      y1 = points[1],
+      x2 = points[2],
+      y2 = points[3],
 
-					dx = x2 - x1,
-					dy = y2 - y1,
+      dx = x2 - x1,
+      dy = y2 - y1,
 
-					angle = Math.atan2(dy, dx);
+      angle = Math.atan2(dy, dx);
 
-			angle *= 180 / Math.PI;
-			angle += 90;
+    angle *= 180 / Math.PI;
+    angle += 90;
 
-			var triangle = new fabric.Triangle({
-				angle: angle,
-				fill: 'black',
-				top: y2,
-				left: x2,
-				height: headLength,
-				width: headLength,
-				originX: 'center',
-				originY: 'center',
-				// lockScalingX:false,
-				// lockScalingY:true,
-			});
+    var triangle = new fabric.Triangle({
+      angle: angle,
+      fill: 'black',
+      top: y2,
+      left: x2,
+      height: headLength,
+      width: headLength,
+      originX: 'center',
+      originY: 'center',
+      // lockScalingX:false,
+      // lockScalingY:true,
+    });
 
-			return triangle;
-		}
+    return triangle;
+  }
   rasterizeSVG() {
     const w = window.open('');
     w.document.write(this.canvas.toSVG());
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(this.canvas.toSVG());
   }
-  url0:any;
-  carto:any
-   saveCanvasToJSON(local:any) {
+  url0: any;
+  carto: any
+  saveCanvasToJSON(local: any) {
     var formData: any = new FormData();
 
     const json = JSON.stringify(this.canvas);
@@ -1030,15 +1159,15 @@ setCanvasImageBack(url:any) {
     var myFile = this.convertBlobFichier(blob, "assets/cartographie.json");
     formData.append('Id_Local', local);
     formData.append('Detail', myFile);
-     console.log(blob)
-     this.service.saveCarto(formData).subscribe( data =>{
-      console.log("carto change",data);
-      },
-   error => console.log(error)); 
+    console.log(blob)
+    this.service.saveCarto(formData).subscribe(data => {
+      console.log("carto change", data);
+    },
+      error => console.log(error));
 
 
 
-    
+
   }
 
   loadCanvasFromJSON() {
@@ -1064,7 +1193,7 @@ setCanvasImageBack(url:any) {
   rasterizeJSON() {
     var formData: any = new FormData();
     this.json = JSON.stringify(this.canvas, null, 2);
-    const userBlob = new Blob((this.json),{ type: "application/json"});
+    const userBlob = new Blob((this.json), { type: "application/json" });
     formData.append('cartographie', userBlob);
     console.log(formData)
   }
@@ -1079,12 +1208,12 @@ setCanvasImageBack(url:any) {
     //A Blob() is almost a File() - it's just missing the two properties below which we will add
     b.lastModifiedDate = new Date();
     b.name = fileName;
-  
+
     //Cast to a File() type
     return <File>theBlob;
   }
-  
-  
+
+
   //convertir blob à un fichier  
   convertBlobFichier = (theBlob: Blob, fileName: string): File => {
     var b: any = theBlob;
@@ -1092,11 +1221,11 @@ setCanvasImageBack(url:any) {
     b.name = fileName;
     return <File>theBlob;
   }
-  
+
 }
 function eventHandler(arg0: string, eventHandler: any) {
   throw new Error('Function not implemented.');
 }
 
- 
+
 
