@@ -48,8 +48,8 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
   public textString: string;
   public url: string | ArrayBuffer = '';
   public urlback: string | ArrayBuffer = '';
-  public noredo:boolean=true
-  public noundo:boolean=true
+  public noredo: boolean = true
+  public noundo: boolean = true
   public size: any = {
     width: 900,
     height: 700
@@ -69,7 +69,7 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
     this.idLocal = this.route.snapshot.params['id'];
 
 
- 
+
 
   }
   private scale = 1;
@@ -185,11 +185,11 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
         console.log("move")
       },
       'object:modified': (e) => {
-      
+
         console.log("modif")
       },
       'selection:updated': (e) => {
-       this.saveUndoRedo("Object udpate ")
+        this.saveUndoRedo("Object udpate ")
         console.log("udpate selection")
       },
       'selection:created': (e) => {
@@ -239,10 +239,10 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
       'object:removed': (e) => {
         console.log("remove")
         this.saveUndoRedo("Object removed")
-        
+
       },
       'object:added': (e) => {
-      //  console.log(" aded")
+        //  console.log(" aded")
         this.saveUndoRedo("Object aded")
       },
       'path:created': (e) => {
@@ -253,42 +253,42 @@ export class FabricjsEditorComponent implements AfterViewInit, AfterViewChecked 
     );
     this.canvas.setWidth(this.size.width);
     this.canvas.setHeight(this.size.height);
-    this.h=this.size.height
-    this.w=this.size.width
+    this.h = this.size.height
+    this.w = this.size.width
     // get references to the html canvas element & its context
     this.canvas.on('mouse:down', (e) => {
       const canvasElement: any = document.getElementById('canvas');
     });
-//Listen for undo/redo 
+    //Listen for undo/redo 
 
-  
+
   }
-  w:any
-  h:any
- saveUndoRedo(string:any){
+  w: any
+  h: any
+  saveUndoRedo(string: any) {
     if (!this.pause_saving) {
-          this.undo_stack.push(JSON.stringify(this.canvas));
-        //  this.redo_stack = [];
-//console.log(string, this.undo_stack);
-//console.log(string);
- if(this.undo_stack!=[])
-this.noundo=false
-if(this.redo_stack!=[])
-this.noredo=false 
-      } 
+      this.undo_stack.push(JSON.stringify(this.canvas));
+      //  this.redo_stack = [];
+      //console.log(string, this.undo_stack);
+      //console.log(string);
+      if (this.undo_stack != [])
+        this.noundo = false
+      if (this.redo_stack != [])
+        this.noredo = false
+    }
 
-}
+  }
 
   undo() {
     this.pause_saving = true;
-     this.redo_stack.push(this.undo_stack.pop());
-     let previous_state = this.undo_stack[this.undo_stack.length - 1];
+    this.redo_stack.push(this.undo_stack.pop());
+    let previous_state = this.undo_stack[this.undo_stack.length - 1];
     if (previous_state == null) {
       previous_state = '{}';
     }
 
     this.canvas.loadFromJSON(previous_state, this.canvas.renderAll.bind(this.canvas), function (o: any, object: any) {
-      
+
     });
     this.pause_saving = false;
 
@@ -299,12 +299,12 @@ this.noredo=false
     console.log("state", this.redo_stack)
 
     this.pause_saving = true;
-     let state = this.redo_stack.pop();
+    let state = this.redo_stack.pop();
     if (state != null) {
 
       this.undo_stack.push(state);
       this.canvas.loadFromJSON(state, this.canvas.renderAll.bind(this.canvas), function (o: any, object: any) {
-        
+
       });
       this.pause_saving = false;
     }
@@ -389,19 +389,29 @@ this.noredo=false
       const reader = new FileReader();
       reader.onload = (readerEvent) => {
         this.url = readerEvent.target.result;
+        console.log("url", this.url)
+        this.addImageOnCanvas(this.url)
       };
       reader.readAsDataURL(event.target.files[0]);
+      console.log("img", event.target.files[0])
     }
+
   }
 
   readUrlBack(event: any) {
+    console.log("readUrlBack", event)
     if (event.target.files && event.target.files[0]) {
       const reader = new FileReader();
       reader.onload = (readerEvent) => {
         this.urlback = readerEvent.target.result;
+        console.log("back", this.urlback)
+        this.setCanvasImageBack(this.urlback)
       };
       reader.readAsDataURL(event.target.files[0]);
     }
+    console.log("img", event.target.files[0])
+
+
   }
 
   removeWhite(url: any) {
@@ -533,19 +543,19 @@ this.noredo=false
           props = ['tr', 'br', 'bl', 'tl'],
           jLen = props.length,
           ignoreZoom = true;
-    
+
         let o = this.original;
         o.setCoords(ignoreZoom);
         for (let j = 0; j < jLen; j++) {
-         let  prop = props[j];
+          let prop = props[j];
           aX.push(o.oCoords[prop].x);
           aY.push(o.oCoords[prop].y);
         }
-    
+
         this._getBounds(aX, aY, onlyWidthHeight);
       },
     });
- 
+
     const EraserBrush = fabric.util.createClass(fabric.PencilBrush, {
 
       _finalizeAndAddPath: function () {
@@ -556,36 +566,36 @@ this.noredo=false
         }
         var pathData = this.convertPointsToSVGPath(this._points).join('');
         if (pathData === 'M 0 0 Q 0 0 0 0 L 0 0') {
-       
+
           this.canvas.requestRenderAll();
           return;
         }
-    
+
         // use globalCompositeOperation to 'fake' eraser
         var path = this.createPath(pathData);
         path.globalCompositeOperation = 'destination-out';
         path.selectable = false;
         path.evented = false;
         path.absolutePositioned = true;
-    
+
         // grab all the objects that intersects with the path
-        const objects = this.canvas.getObjects().filter((obj:any) => {
+        const objects = this.canvas.getObjects().filter((obj: any) => {
           // if (obj instanceof fabric.Textbox) return false;
           // if (obj instanceof fabric.IText) return false;
           if (!obj.intersectsWithObject(path)) return false;
           return true;
         });
-    
+
         if (objects.length > 0) {
-    
+
           // merge those objects into a group
           const mergedGroup = new fabric.Group(objects);
-    
+
           const newPath = new ErasedGroup(mergedGroup, path);
-    
+
           const left = newPath.left;
           const top = newPath.top;
-    
+
           // convert it into a dataURL, then back to a fabric image
           const newData = newPath.toDataURL({
             withoutTransform: true
@@ -595,13 +605,13 @@ this.noredo=false
               left: left,
               top: top,
             });
-    
+
             // remove the old objects then add the new image
             this.canvas.remove(...objects);
             this.canvas.add(fabricImage);
           });
         }
-    
+
         this.canvas.clearContext(this.canvas.contextTop);
         this.canvas.renderAll();
         this._resetShadow();
@@ -614,7 +624,7 @@ this.noredo=false
     this.canvas.freeDrawingBrush = eraserBrush;
     this.canvas.isDrawingMode = true;
   }
- 
+
   cleanSelect() {
     this.canvas.discardActiveObject().renderAll();
   }
@@ -657,8 +667,8 @@ this.noredo=false
     if (url) {
       fabric.Image.fromURL(url, (img) => {
         this.canvas.setBackgroundImage(img, this.canvas.renderAll.bind(this.canvas), {
-           scaleX: this.w / img.width,
-           scaleY: this.h / img.height
+          scaleX: this.w / img.width,
+          scaleY: this.h / img.height
 
         });
       });
@@ -957,24 +967,24 @@ this.noredo=false
     this.canvas.isDrawingMode = true;
     this.canvas.freeDrawingBrush.width = 5;
     this.canvas.freeDrawingBrush.color = 'black';
-    
+
     this.canvas.on('path:created', (e) => {
-      
-       this.canvas.renderAll();
-  });
-}
- 
-  
+
+      this.canvas.renderAll();
+    });
+  }
+
+
   stopdrawLine() {
 
     console.log('stop')
-   // this.isDown = false
+    // this.isDown = false
     this.canvas.isDrawingMode = false
   }
   cursor() {
 
     console.log('stop')
-   // this.isDown = false
+    // this.isDown = false
     this.canvas.isDrawingMode = false
   }
   rasterize() {

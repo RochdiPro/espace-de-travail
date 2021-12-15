@@ -1,0 +1,22 @@
+<h1 mat-dialog-title>Ajouter Text </h1>
+
+<div mat-dialog-content>
+    <div class="card-body max-height">
+        <div  class="input-group">
+            <input type="text" class="form-control" [(ngModel)]="canvas.textString">
+            <div class="input-group-append">
+                <span>
+                    <button id="add-text" data-toggle="tooltip" data-placement="bottom" title="Add text"
+                        class="btn btn-primary" (click)="addText()">
+                        <i class="fa fa-plus" aria-hidden="true"></i>
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div mat-dialog-actions class="float-right">
+      <button class="mb-2 mr-2 btn btn-primary" (click)="close()">Fermer</button>
+
+</div>

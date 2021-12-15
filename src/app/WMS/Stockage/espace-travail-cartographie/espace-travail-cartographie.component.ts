@@ -6,7 +6,7 @@ import { StockageService } from '../services/stockage.service';
 import { FabricjsEditorComponent } from './angular-editor-fabric-js/src/public-api';
  import { Component, OnInit, HostListener, HostBinding ,ViewChild,Input, ElementRef} from '@angular/core';
  import { MatDialog } from '@angular/material/dialog';
- import { ArrowEspaceTravailDialogComponent, ImageEspaceTravailDialogComponent, LineEspaceTravailDialogComponent } from './dialogue-espace-travail/dialogue-espace-travail.component.component';
+ import { AddTextDialogComponent, ArrowEspaceTravailDialogComponent, DimensionDialogComponent, ImageEspaceTravailDialogComponent, LineEspaceTravailDialogComponent } from './dialogue-espace-travail/dialogue-espace-travail.component.component';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
@@ -189,8 +189,23 @@ showTools=true
   }
   //bouton plus pour plus d'inormation sur le local selectionné
   openDialogImageEspace() {
-    //ouvrir la boite dialogue DialogInfoLocal
+    //ouvrir la boite dialogue DialogImageEspace
     const dialogRef = this.dialog.open(ImageEspaceTravailDialogComponent, {
+      width: 'auto',
+      data: {  canvas:this.canvas }
+    });
+  }
+  openDialogText(){
+    //ouvrir la boite dialogue DialogAddText
+    const dialogRef = this.dialog.open(AddTextDialogComponent, {
+      width: 'auto',
+      data: {  canvas:this.canvas }
+    });
+  }
+  openDimensionDialog()
+  {
+    //ouvrir la boite dialogue DimensionDialog
+    const dialogRef = this.dialog.open(DimensionDialogComponent, {
       width: 'auto',
       data: {  canvas:this.canvas }
     });
@@ -226,7 +241,7 @@ showTools=true
   }
   public readUrlBack(event:any) {
     this.canvas.readUrlBack(event);
-  }
+   }
   addTextShow=false
 
   addTextToggle(){
@@ -375,10 +390,13 @@ public redo() {
   public config: PerfectScrollbarConfigInterface = {
     useBothWheelAxes: true, suppressScrollX: false, suppressScrollY: false
   };
+  public config2: PerfectScrollbarConfigInterface = {
+    useBothWheelAxes: true, suppressScrollX: false, suppressScrollY: false
+  };
 
   @ViewChild(PerfectScrollbarComponent) componentRef?: PerfectScrollbarComponent;
   @ViewChild(PerfectScrollbarDirective) directiveRef?: PerfectScrollbarDirective;
-
+showimgback=false
  
   public toggleType(): void {
     this.type = (this.type === 'component') ? 'directive' : 'component';

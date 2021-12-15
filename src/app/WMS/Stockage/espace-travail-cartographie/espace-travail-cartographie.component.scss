@@ -33,12 +33,12 @@
   overflow: hidden;
 }
 
-
+ 
   .main-title{
     margin-top: 10px;
   }
   .images-item {
-    width: 80%;
+    width: 100%;
     cursor: pointer;
     -webkit-transition: .5s ease;
     -webkit-transition: .5s ease;
@@ -329,7 +329,8 @@ $border: #e2e2e2;
   &:hover {
     background-color: #e6f3e7;
     > .submenu {
-      display: inline-block;
+      display: block;
+
     }
   }
   i {
@@ -341,8 +342,12 @@ $border: #e2e2e2;
     padding: 12px 75px 12px 17px;
 
 }
-.has_submenu {
+.item {
   width: 40px;
+
+}
+.scrolimage{
+  max-height: 120px;
 }
 .has_submenu:after {
   content: '+';
@@ -350,6 +355,8 @@ $border: #e2e2e2;
   right: 15px;
   font-size: 14px;
   font-weight: 400;
+
+
 }
 .hasnt_submenu:after {
    position: absolute;
@@ -358,15 +365,23 @@ $border: #e2e2e2;
   font-weight: 400;
 }
 
+.perfectScroll {
+  z-index: 900;
+  max-height: 600px;
+   max-width: 300px;
+   overflow-x: visible;
+
+}
+
 .submenu {
-  width:100%;
-  display: none;
+   display: none;
   position: absolute;
   top: -2px;
-  left: 100%;
+ // left: 100%;
   border-width: 1px 1px 1px 1px;
   border-style:solid;
-  z-index: 1;
+  z-index: 950;
+  overflow: scroll;
 
   border-color: blue $border $border $border;
   border-radius: $radius;

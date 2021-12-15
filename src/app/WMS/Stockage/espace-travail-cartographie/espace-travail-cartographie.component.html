@@ -28,39 +28,26 @@
 <div class="row">
 
 
-    <div class="col-1"  *ngIf="showTools" >
+    <div class="col-1" *ngIf="showTools" style="z-index: 999999; overflow-x: visible;">
         <div>
             <img src="../../../../assets/wms-images/icon/arrows_left_double.png" width="20px" height="20px"
                 (click)="hideTools()">
         </div>
 
-        <perfect-scrollbar style="max-height: 600px; max-width: 100px;" [config]="config" *ngIf="showTools">
+        <perfect-scrollbar class="perfectScroll" [config]="config" *ngIf="showTools">
             <div>
                 <!-- Taille canvans -->
-                <div class="taille">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <input type="text" class="form-control" [(ngModel)]="canvas.size.width"
-                                (keyup)="changeSize()">
-                            <div class="input-group-append">
-                                <span class="input-group-text">
-                                    L
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="input-group mb-4">
-                            <input type="text" class="form-control" [(ngModel)]="canvas.size.height"
-                                (keyup)="changeSize()">
-                            <div class="input-group-append">
-                                <span class="input-group-text">
-                                    H
-                                </span>
-                            </div>
-                        </div>
+
+                <div class="custom-item">
+                    <div class="item hasnt_submenu" width="40px">
+                        <label for="backcolor" class="btn">
+                            <img (click)="openDimensionDialog()" src="../../../../assets/wms-images/icon/dimension.png"
+                                width="40px" height="40px">
+                        </label>
+
                     </div>
                 </div>
+
                 <!-- les outils -->
                 <div *ngIf="!canvas.selected">
                     <!-- back ground color -->
@@ -79,26 +66,26 @@
                     <!-- back ground image -->
                     <div class="custom-item">
                         <div class="item hasnt_submenu" width="40px">
-                            <label for="files" class="btn">
-                                <img src="../../../../assets/wms-images/icon/uplodeimg.png" width="40px" height="40px">
+                            <label  for="files1" class="btn">
+                                <img src="../../../../assets/wms-images/icon/backimg.png" width="40px" height="40px">
                             </label>
-                            <input id="files" style="visibility:hidden;" type="file" (change)="readUrlBack($event);">
-                            <img id="testImage" *ngIf="canvas.urlback" class="images-item-upload" [src]="canvas.urlback"
+                            <input id="files1" style="visibility:hidden;" type="file" (change)="readUrlBack($event);">
+                            <!-- <img id="testImage" *ngIf="canvas.urlback" class="images-item-upload" [src]="canvas.urlback"
                                 (click)="setCanvasImageBack(canvas.urlback);">
 
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-outline-danger btn-sm"
                                     (click)="removeWhiteback(canvas.urlback);">
                                     <i class="fa fa-times" aria-hidden="true"></i> </button>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
-
+                    <!-- cusros -->
                     <div class="card-body">
 
                         <img src="../../../../assets/wms-images/icon/cursor.png" width="40px" height="40px"
                             (click)="cursor()">
-                             
+
 
                     </div>
                     <!-- drawing -->
@@ -107,41 +94,32 @@
 
                         <img src="../../../../assets/wms-images/icon/pencil.png" width="40px" height="40px"
                             (click)="drawLine()">
-                          
+
                     </div>
+                    <!-- eraser -->
                     <div class="card-body">
 
                         <img src="../../../../assets/wms-images/icon/gomme.png" width="40px" height="40px"
                             (click)="earaser()">
-                      
-                           
+
+
                     </div>
 
 
 
                     <!-- ajouter text -->
                     <div class="card-body">
-                        <img (click)="addTextToggle()" src="../../../../assets/wms-images/icon/text.png" width="40px"
+                        <img (click)="openDialogText()" src="../../../../assets/wms-images/icon/text.png" width="40px"
                             height="40px">
-                        <div *ngIf="addTextShow" class="input-group">
-                            <input type="text" class="form-control" [(ngModel)]="canvas.textString">
-                            <div class="input-group-append">
-                                <span>
-                                    <button id="add-text" data-toggle="tooltip" data-placement="bottom" title="Add text"
-                                        class="btn btn-primary" (click)="addText()">
-                                        <i class="fa fa-plus" aria-hidden="true"></i>
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
+
                     </div>
 
                     <!-- ajout figure menu -->
-                    <div class="item has_submenu" width="40px">
+                    <div class="item has_submenu" >
 
                         <img src="../../../../assets/wms-images/icon/shapes.png" width="40px" height="40px">
 
-                        <div class="submenu">
+                        <div class="submenu" style="height: 150px;width: 200px; overflow-y: scroll;overflow-x: hidden; top: 0; left: 0; z-index: 999999999;"   >
                             <div class="item">
 
                                 <div class="btn-group btn-group-vertical" role="group" aria-label="...">
@@ -188,56 +166,55 @@
                     </div>
 
 
-
-
-
-
-
-
-
                     <!-- ajouter image -->
-                    <div class="item has_submenu" width="40px">
+                    <div class="item has_submenu" width="40px" style="position: relative;">
 
                         <img (click)="openDialogImageEspace()" src="../../../../assets/wms-images/icon/images.png"
                             width="40px" height="40px">
 
-                        <div class="submenu">
-                            <div class="item">
-                                <div class="card-body max-height">
-                                    <div class="row">
+                        <div class="submenu"  style="height: 150px;width: 200px; overflow-y: scroll;overflow-x: hidden; position:absolute; top: 0; left: 0; z-index: 999999999;">
+                            <!-- <perfect-scrollbar  class="scrolimage" [config]="config2"> -->
 
+                                <div class="item">
+                                     <div class="btn-group btn-group-vertical" role="group" aria-label="...">
 
+                                        <div class="row">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                            width="50px" height="50px" src="../../../../assets/wms-images/fabric/img1.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img2.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img3.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img4.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img5.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img6.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img7.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img8.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img9.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img10.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img11.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img12.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img13.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img14.svg">
+                                            <img class="images-item" (click)="getImgPolaroid($event)"
+                                                src="../../../../assets/wms-images/fabric/img15.svg">
+                                        </div>
 
-
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../assets/wms-images/fabric/img1.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../assets/wms-images/fabric/img2.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../assets/wms-images/fabric/img3.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../assets/wms-images/fabric/img4.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../assets/wms-images/fabric/img5.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../assets/wms-images/fabric/img6.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../assets/wms-images/fabric/img7.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../assets/wms-images/fabric/img8.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../assets/wms-images/fabric/img9.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../assets/wms-images/fabric/img10.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../assets/wms-images/fabric/img11.svg">
-                                        <img class="images-item" (click)="getImgPolaroid($event)"
-                                            src="../../../../assets/wms-images/fabric/img12.svg">
                                     </div>
 
                                 </div>
-
-                            </div>
+                            <!-- </perfect-scrollbar> -->
                         </div>
                     </div>
 
@@ -249,14 +226,14 @@
                                 <img src="../../../../assets/wms-images/icon/uplodeimg.png" width="40px" height="40px">
                             </label>
                             <input id="files" style="visibility:hidden;" type="file" (change)="readUrl($event);">
-                            <img id="testImage" *ngIf="canvas.url" class="images-item-upload" [src]="canvas.url"
+                            <!-- <img id="testImage" *ngIf="canvas.url" class="images-item-upload" [src]="canvas.url"
                                 (click)="addImageOnCanvas(canvas.url);">
 
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-outline-danger btn-sm"
                                     (click)="removeWhite(canvas.url);">
                                     <i class="fa fa-times" aria-hidden="true"></i> </button>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -276,8 +253,8 @@
     </div>
 
     <div *ngIf="!showTools">
-        <div class="col-4" ></div>
-        </div>
+        <div class="col-4"></div>
+    </div>
     <div class="col-xl-2">
         <perfect-scrollbar style="max-width: 700px; max-height: 600px;" [config]="config">
 
@@ -286,11 +263,11 @@
                 <div class="card-body text-center">
                     <div class="btn-group" role="group" aria-label="...">
                         <button id="undo" data-toggle="tooltip" data-placement="bottom" title="Delete element"
-                        [disabled]="canvas.noundo"    type="button" (click)="undo();" class="btn btn-outline-primary">
+                            [disabled]="canvas.noundo" type="button" (click)="undo();" class="btn btn-outline-primary">
                             <i class="fa fa-undo" aria-hidden="true"></i>
                         </button>
                         <button id="redo" data-toggle="tooltip" data-placement="bottom" title="Send to back"
-                        [disabled]="canvas.noredo"   type="button" (click)="redo();" class="btn btn-outline-primary">
+                            [disabled]="canvas.noredo" type="button" (click)="redo();" class="btn btn-outline-primary">
                             <i class="fa fa-redo" aria-hidden="true"></i>
                         </button>
 

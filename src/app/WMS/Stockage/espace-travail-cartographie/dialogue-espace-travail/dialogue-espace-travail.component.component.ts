@@ -172,6 +172,34 @@ export class LineEspaceTravailDialogComponent implements OnInit {
 }
 
 @Component({
+  selector: 'dimension-dialog',
+  templateUrl: './dimension.component.html',
+})
+export class DimensionDialogComponent implements OnInit {
+  ngOnInit(): void {
+  }
+  canvas: any
+  constructor(public dialogRef: MatDialogRef<DimensionDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private router: Router, private http: HttpClient) {
+
+    this.canvas = data.canvas
+  }
+
+  onSubmit() {
+
+
+  }
+  public changeSize() {
+    this.canvas.changeSize();
+  }
+  //fermer dialogue
+  close() {
+
+    this.dialogRef.close();
+  }
+}
+
+@Component({
   selector: 'image-espace-travail-dialog',
   templateUrl: './image-espace-travail.component.html',
 })
@@ -192,6 +220,40 @@ export class ImageEspaceTravailDialogComponent implements OnInit {
   public getImgPolaroid(event: any) {
     this.canvas.getImgPolaroid(event);
   }
+  //fermer dialogue
+  close() {
+
+    this.dialogRef.close();
+  }
+}
+
+
+
+
+
+
+@Component({
+  selector: 'add-text-dialog',
+  templateUrl: './add-text.component.html',
+})
+export class AddTextDialogComponent implements OnInit {
+  ngOnInit(): void {
+  }
+  canvas: any
+  constructor(public dialogRef: MatDialogRef<AddTextDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private router: Router, private http: HttpClient) {
+
+    this.canvas = data.canvas
+  }
+
+  onSubmit() {
+
+
+  }
+  public addText() {
+    this.canvas.addText();
+  }
+
   //fermer dialogue
   close() {
 

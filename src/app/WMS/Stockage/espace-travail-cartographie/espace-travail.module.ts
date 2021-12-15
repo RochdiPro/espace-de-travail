@@ -16,7 +16,7 @@ import {   CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
  import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { EspaceTravailRoutingModule } from './espace-travail-routing.module';
 import { EspaceTravailCartographieComponent } from './espace-travail-cartographie.component';
- import { ArrowEspaceTravailDialogComponent, DialogueEspacaTravailComponent, ImageEspaceTravailDialogComponent, LineEspaceTravailDialogComponent } from './dialogue-espace-travail/dialogue-espace-travail.component.component';
+ import { AddTextDialogComponent, ArrowEspaceTravailDialogComponent, DialogueEspacaTravailComponent, DimensionDialogComponent, ImageEspaceTravailDialogComponent, LineEspaceTravailDialogComponent } from './dialogue-espace-travail/dialogue-espace-travail.component.component';
 import { MatRadioModule } from '@angular/material/radio';
  
 @NgModule({
@@ -29,6 +29,8 @@ import { MatRadioModule } from '@angular/material/radio';
  ImageEspaceTravailDialogComponent,
   ArrowEspaceTravailDialogComponent,
  LineEspaceTravailDialogComponent,
+ DimensionDialogComponent,
+ AddTextDialogComponent,
    ],
   exports: [
 
